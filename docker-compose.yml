@@ -1,0 +1,54 @@
+services:
+  # 1. LA BASE DE DATOS
+  mysql_servidor:
+    image: mysql:8
+    container_name: mysql_servidor
+    environment:
+      MYSQL_ROOT_PASSWORD: password_seguro_123
+      MYSQL_DATABASE: universidad_backend
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # 2. GESTIÓN ESTUDIANTES
+  estudiantes:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_estudiantes
+    volumes:
+      - ./gestion-estudiante:/app
+    working_dir: /app
+    ports:
+      - "8081:8081"
+    command: mvn spring-boot:run
+    depends_on:
+      - mysql_servidor
+
+  # 3. GESTIÓN PROFESORES
+  profesores:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_profesores
+    volumes:
+      - ./gestion-profesor:/app
+    working_dir: /app
+    ports:
+      - "8082:8082"
+    command: mvn spring-boot:run
+    depends_on:
+      - mysql_servidor
+
+  # 4. BECAS
+  becas:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_becas
+    volumes:
+      - ./beca:/app
+    working_dir: /app
+    ports:
+      - "8086:8086"
+    command: mvn spring-boot:run
+    depends_on:
+      - mysql_servidor
+
+volumes:
+  mysql_data:

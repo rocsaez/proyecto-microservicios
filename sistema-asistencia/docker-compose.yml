@@ -1,0 +1,36 @@
+services:
+  db-asistencia:
+    image: mysql:8.0
+    container_name: mysql_asistencia
+    environment:
+      MYSQL_ROOT_PASSWORD: clave_maestra_root
+      MYSQL_DATABASE: universidad_backend
+      MYSQL_USER: desarrollador
+      MYSQL_PASSWORD: password_seguro_123
+    ports:
+      - "3313:3306"
+    networks:
+      - red_asistencia
+    volumes:
+      - persistencia_db_asistencia:/var/lib/mysql
+
+  workspace-asistencia:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_asistencia
+    ports:
+      - "8088:8088"
+    depends_on:
+      - db-asistencia
+    networks:
+      - red_asistencia
+    command: tail -f /dev/null
+    volumes:
+      - ./src:/app/src
+      - ./pom.xml:/app/pom.xml
+
+networks:
+  red_asistencia:
+    driver: bridge
+
+volumes:
+  persistencia_db_asistencia:

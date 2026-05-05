@@ -1,0 +1,37 @@
+
+
+services:
+  db-evaluacion:
+    image: mysql:8.0
+    container_name: mysql_evaluacion
+    environment:
+      MYSQL_ROOT_PASSWORD: clave_maestra_root
+      MYSQL_DATABASE: universidad_backend
+      MYSQL_USER: desarrollador
+      MYSQL_PASSWORD: password_seguro_123
+    ports:
+      - "3309:3306"
+    networks:
+      - red_evaluacion
+    volumes:
+      - persistencia_db_evaluacion:/var/lib/mysql
+
+  workspace-evaluacion:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_evaluacion
+    ports:
+      - "8084:8084"
+    depends_on:
+      - db-evaluacion
+    networks:
+      - red_evaluacion
+    command: tail -f /dev/null
+    volumes:
+      - ./codigo-fuente:/app
+
+networks:
+  red_evaluacion:
+    driver: bridge
+
+volumes:
+  persistencia_db_evaluacion:

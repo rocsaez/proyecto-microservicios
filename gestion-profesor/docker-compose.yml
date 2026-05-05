@@ -1,0 +1,42 @@
+
+services:
+  # ------------------------------------------------------------------
+  # CONTENEDOR 1: LA BASE DE DATOS MYSQL PARA PROFESORES
+  # ------------------------------------------------------------------
+  db-servicio-profesor:
+    image: mysql:8.0
+    container_name: mysql_profesor
+    environment:
+      MYSQL_ROOT_PASSWORD: clave_maestra_root
+      MYSQL_DATABASE: universidad_backend
+      MYSQL_USER: desarrollador
+      MYSQL_PASSWORD: password_seguro_123
+    ports:
+      - "3307:3306"
+    networks:
+      - red_profesores
+    volumes:
+      - persistencia_db_profesor:/var/lib/mysql
+
+  # ------------------------------------------------------------------
+  # CONTENEDOR 2: EL ENTORNO DE TRABAJO JAVA/SPRING BOOT
+  # ------------------------------------------------------------------
+  workspace-java-profesor:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_profesor
+    ports:
+      - "8082:8082"
+    depends_on:
+      - db-servicio-profesor
+    networks:
+      - red_profesores
+    command: tail -f /dev/null
+    volumes:
+      - ./codigo-fuente:/app
+
+networks:
+  red_profesores:
+    driver: bridge
+
+volumes:
+  persistencia_db_profesor:

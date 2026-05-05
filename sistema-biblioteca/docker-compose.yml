@@ -1,0 +1,36 @@
+
+services:
+  db-biblioteca:
+    image: mysql:8.0
+    container_name: mysql_biblioteca
+    environment:
+      MYSQL_ROOT_PASSWORD: clave_maestra_root
+      MYSQL_DATABASE: universidad_backend
+      MYSQL_USER: desarrollador
+      MYSQL_PASSWORD: password_seguro_123
+    ports:
+      - "3308:3306"
+    networks:
+      - red_biblioteca
+    volumes:
+      - persistencia_db_biblioteca:/var/lib/mysql
+
+  workspace-biblioteca:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_biblioteca
+    ports:
+      - "8083:8083"
+    depends_on:
+      - db-biblioteca
+    networks:
+      - red_biblioteca
+    command: tail -f /dev/null
+    volumes:
+      - ./codigo-fuente:/app
+
+networks:
+  red_biblioteca:
+    driver: bridge
+
+volumes:
+  persistencia_db_biblioteca:
