@@ -2,8 +2,7 @@
 
 ## Integrantes
 - Rocío Sáez
-- [Nombre Integrante 2]
-- [Nombre Integrante 3]
+
 
 ## Arquitectura y Estado del Sistema
 El sistema utiliza una arquitectura de microservicios **totalmente descentralizada**. Cada servicio posee su propio contenedor de aplicación y su propia instancia de base de datos MySQL aislada.
@@ -24,5 +23,4 @@ El sistema utiliza una arquitectura de microservicios **totalmente descentraliza
 - **Orquestación:** Docker Compose (Descentralizado por módulo)
 - **Repositorio:** https://github.com/rocsaez/proyecto-microservicios
 
-### Cómo levantar el ecosistema completo
-Para iniciar todos los servicios y sus respectivas bases de datos simultáneamente desde la raíz del proyecto, ejecute:
+
