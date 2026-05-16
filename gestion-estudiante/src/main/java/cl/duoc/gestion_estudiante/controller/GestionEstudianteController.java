@@ -7,10 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * @RestController indica que esta clase responderá peticiones web y devolverá datos (como JSON).
- * @RequestMapping("/api/estudiantes") define la URL base.
- */
 @RestController
 @RequestMapping("/api/estudiantes")
 public class GestionEstudianteController {
@@ -21,60 +17,62 @@ public class GestionEstudianteController {
         this.service = service;
     }
 
-    /**
-     * CREATE - POST: Se usa para enviar y crear nuevos datos.
-     */
+    // 1. CREAR: Guardar un estudiante nuevo
     @PostMapping
-    public ResponseEntity<GestionEstudianteModel> crear(@RequestBody GestionEstudianteModel estudiante) {
-        GestionEstudianteModel nuevo = service.guardarEstudiante(estudiante);
-        return (nuevo != null) ? ResponseEntity.ok(nuevo) : ResponseEntity.badRequest().build();
+    public ResponseEntity<?> crear(@RequestBody GestionEstudianteModel estudiante) {
+        try {
+            GestionEstudianteModel nuevo = service.guardarEstudiante(estudiante);
+            return ResponseEntity.status(201).body(nuevo); // 201 significa "Creado"
+        } catch (Exception e) {
+            // Si falta un dato o el RUT está mal, manda este mensaje
+            return ResponseEntity.status(400).body("error de la aplicación: no se pudo crear");
+        }
     }
 
-    /**
-     * READ ALL - GET: Solicita la lista de todos los estudiantes.
-     */
+    // 2. LEER TODOS: Listar a todos los alumnos
     @GetMapping
     public List<GestionEstudianteModel> listarTodos() {
         return service.obtenerTodos();
     }
 
-    /**
-     * READ BY ID - GET: Solicita información de un elemento específico por su ID.
-     */
+    // 3. LEER POR ID: Buscar uno solo
     @GetMapping("/{id}")
-    public ResponseEntity<GestionEstudianteModel> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<?> obtenerPorId(@PathVariable Long id) {
         Optional<GestionEstudianteModel> estudiante = service.obtenerPorId(id);
-        return estudiante.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        if (estudiante.isPresent()) {
+            return ResponseEntity.ok(estudiante.get());
+        } else {
+            return ResponseEntity.status(404).body("Error de la aplicación: estudiante no encontrado");
+        }
     }
 
-    /**
-     * READ BY RUT - GET: Busca un estudiante específico usando su RUT en la URL.
-     */
-    @GetMapping("/rut/{rut}")
-    public ResponseEntity<GestionEstudianteModel> obtenerPorRut(@PathVariable String rut) {
-        Optional<GestionEstudianteModel> estudiante = service.obtenerPorRut(rut);
-        return estudiante.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    // 4. ACTUALIZAR: El método PUT que faltaba para editar datos
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody GestionEstudianteModel datosNuevos) {
+        try {
+            GestionEstudianteModel actualizado = service.actualizarEstudiante(id, datosNuevos);
+            if (actualizado != null) {
+                return ResponseEntity.ok(actualizado);
+            } else {
+                return ResponseEntity.status(404).body("error de la aplicación: no existe para actualizar");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("error de la aplicación: datos inválidos");
+        }
     }
 
-    /**
-     * DELETE - DELETE (Por ID): Elimina usando el ID numérico.
-     */
+    // 5. ELIMINAR: Borrar por ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
-        if (service.eliminarPorId(id)) {
-            return ResponseEntity.noContent().build();
+    public ResponseEntity<?> eliminar(@PathVariable Long id) {
+        try {
+            boolean eliminado = service.eliminarPorId(id);
+            if (eliminado) {
+                return ResponseEntity.noContent().build(); // 204: Éxito pero vacío
+            } else {
+                return ResponseEntity.status(404).body("error de la aplicación: id no existe");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("error de la aplicación: no se pudo eliminar");
         }
-        return ResponseEntity.notFound().build();
-    }
-
-    /**
-     * DELETE - DELETE (Por RUT): Elimina usando el RUT proporcionado en la URL.
-     */
-    @DeleteMapping("/rut/{rut}")
-    public ResponseEntity<Void> eliminarPorRut(@PathVariable String rut) {
-        if (service.eliminarPorRut(rut)) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
     }
 }

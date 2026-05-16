@@ -1,0 +1,42 @@
+services:
+  # ------------------------------------------------------------------
+  # CONTENEDOR 1: LA BASE DE DATOS MYSQL PARA EL SISTEMA DE CARRERA
+  # ------------------------------------------------------------------
+  db-carrera:
+    image: mysql:8.0
+    container_name: mysql_carrera
+    environment:
+      MYSQL_ROOT_PASSWORD: clave_maestra_root
+      MYSQL_DATABASE: universidad_backend
+      MYSQL_USER: desarrollador
+      MYSQL_PASSWORD: password_seguro_123
+    ports:
+      - "3315:3306"  # Puerto DB Host
+    networks:
+      - red_carrera
+    volumes:
+      - persistencia_db_carrera:/var/lib/mysql
+
+  # ------------------------------------------------------------------
+  # CONTENEDOR 2: EL ENTORNO DE TRABAJO JAVA/SPRING BOOT
+  # ------------------------------------------------------------------
+  workspace-carrera:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_carrera
+    ports:
+      - "8089:8089" # El microservicio correrá en el puerto 8089
+    depends_on:
+      - db-carrera
+    networks:
+      - red_carrera
+    command: tail -f /dev/null
+    volumes:
+      - ./src:/app/src
+      - ./pom.xml:/app/pom.xml
+
+networks:
+  red_carrera:
+    driver: bridge
+
+volumes:
+  persistencia_db_carrera:

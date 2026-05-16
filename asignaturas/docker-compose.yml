@@ -1,0 +1,42 @@
+services:
+  # ------------------------------------------------------------------
+  # CONTENEDOR 1: LA BASE DE DATOS MYSQL PARA EL SISTEMA DE ASIGNATURAS
+  # ------------------------------------------------------------------
+  db-asignaturas:
+    image: mysql:8.0
+    container_name: mysql_asignaturas
+    environment:
+      MYSQL_ROOT_PASSWORD: clave_maestra_root
+      MYSQL_DATABASE: universidad_backend
+      MYSQL_USER: desarrollador
+      MYSQL_PASSWORD: password_seguro_123
+    ports:
+      - "3314:3306"  # Puerto DB Host
+    networks:
+      - red_asignaturas
+    volumes:
+      - persistencia_db_asignaturas:/var/lib/mysql
+
+  # ------------------------------------------------------------------
+  # CONTENEDOR 2: EL ENTORNO DE TRABAJO JAVA/SPRING BOOT
+  # ------------------------------------------------------------------
+  workspace-asignaturas:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_asignaturas
+    ports:
+      - "8080:8080" # El microservicio correrá en el puerto 8080
+    depends_on:
+      - db-asignaturas
+    networks:
+      - red_asignaturas
+    command: tail -f /dev/null
+    volumes:
+      - ./src:/app/src
+      - ./pom.xml:/app/pom.xml
+
+networks:
+  red_asignaturas:
+    driver: bridge
+
+volumes:
+  persistencia_db_asignaturas:

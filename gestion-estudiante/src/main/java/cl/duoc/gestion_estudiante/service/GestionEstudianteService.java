@@ -6,82 +6,48 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * @Service indica que esta clase contiene la lógica de negocio.
- */
 @Service
 public class GestionEstudianteService {
 
-    // Se declara el repositorio para poder usar las funciones de la base de datos.
     private final GestionEstudianteRepository repository;
 
     public GestionEstudianteService(GestionEstudianteRepository repository) {
         this.repository = repository;
     }
 
-    /**
-     * CREATE (Crear): Guarda un nuevo estudiante validando que el RUT sea único.
-     */
+    // Guarda el estudiante en la BD
     public GestionEstudianteModel guardarEstudiante(GestionEstudianteModel estudiante) {
-        if (repository.findByRut(estudiante.getRut()).isPresent()) {
-            return null; 
-        }
         return repository.save(estudiante);
     }
 
-    /**
-     * READ (Leer todos): Obtiene una lista con todos los estudiantes guardados.
-     */
+    // Trae la lista completa
     public List<GestionEstudianteModel> obtenerTodos() {
         return repository.findAll();
     }
 
-    /**
-     * READ (Leer por ID): Busca un estudiante específico usando su identificador único.
-     */
+    // Busca por ID
     public Optional<GestionEstudianteModel> obtenerPorId(Long id) {
         return repository.findById(id);
     }
 
-    /**
-     * READ (Leer por RUT): Busca un estudiante específico usando su RUT.
-     */
-    public Optional<GestionEstudianteModel> obtenerPorRut(String rut) {
-        return repository.findByRut(rut);
-    }
-
-    /**
-     * UPDATE (Actualizar): Reemplaza los datos de un estudiante existente.
-     */
-    public GestionEstudianteModel actualizarEstudiante(Long id, GestionEstudianteModel detalles) {
+    // Lógica para ACTUALIZAR (Manual y tranqui)
+    public GestionEstudianteModel actualizarEstudiante(Long id, GestionEstudianteModel nuevosDatos) {
         Optional<GestionEstudianteModel> existente = repository.findById(id);
-        
         if (existente.isPresent()) {
-            GestionEstudianteModel estudianteAActualizar = existente.get();
-            estudianteAActualizar.setNombreCompleto(detalles.getNombreCompleto());
-            estudianteAActualizar.setCorreo(detalles.getCorreo());
-            return repository.save(estudianteAActualizar);
+            GestionEstudianteModel estudiante = existente.get();
+            // Actualizamos los campos uno por uno
+            estudiante.setNombre(nuevosDatos.getNombre());
+            estudiante.setRut(nuevosDatos.getRut());
+            estudiante.setCorreo(nuevosDatos.getCorreo());
+            return repository.save(estudiante);
         }
         return null;
     }
 
-    /**
-     * DELETE (Eliminar por ID): Borra un estudiante usando su ID.
-     */
+    // Borra de la BD
     public boolean eliminarPorId(Long id) {
         if (repository.existsById(id)) {
             repository.deleteById(id);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * DELETE (Eliminar por RUT): Borra un estudiante usando su RUT.
-     */
-    public boolean eliminarPorRut(String rut) {
-        if (repository.findByRut(rut).isPresent()) {
-            repository.deleteByRut(rut);
             return true;
         }
         return false;

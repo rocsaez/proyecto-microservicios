@@ -1,55 +1,49 @@
 package cl.duoc.gestion_profesor.controller;
-
 import cl.duoc.gestion_profesor.model.GestionProfesorModel;
 import cl.duoc.gestion_profesor.service.GestionProfesorService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
+import java.util.Optional;
+
+
 
 @RestController
 @RequestMapping("/api/profesores")
 public class GestionProfesorController {
-
     private final GestionProfesorService service;
-
-    public GestionProfesorController(GestionProfesorService service) {
-        this.service = service;
-    }
+    public GestionProfesorController(GestionProfesorService service) { this.service = service; }
 
     @PostMapping
-    public ResponseEntity<GestionProfesorModel> crear(@RequestBody GestionProfesorModel profesor) {
-        GestionProfesorModel nuevo = service.guardarProfesor(profesor);
-        return (nuevo != null) ? ResponseEntity.ok(nuevo) : ResponseEntity.badRequest().build();
+    public ResponseEntity<?> crear(@RequestBody GestionProfesorModel p) {
+        try { return ResponseEntity.status(201).body(service.guardar(p)); }
+        catch (Exception e) { return ResponseEntity.status(400).body("error de la aplicación: datos inválidos"); }
     }
 
-    @GetMapping
-    public List<GestionProfesorModel> listarTodos() {
-        return service.obtenerTodos();
-    }
+   @GetMapping("/{id}")
+    public ResponseEntity<?> porId(@PathVariable Long id) {
+        // 1. Buscamos al profesor en el servicio
+        Optional<GestionProfesorModel> profesor = service.obtenerPorId(id);
 
-    @GetMapping("/{id}")
-    public ResponseEntity<GestionProfesorModel> obtenerPorId(@PathVariable Long id) {
-        return service.obtenerPorId(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
-    }
-
-    @GetMapping("/rut/{rut}")
-    public ResponseEntity<GestionProfesorModel> obtenerPorRut(@PathVariable String rut) {
-        return service.obtenerPorRut(rut).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        // 2. Si existe, lo devolvemos con un OK (200)
+        if (profesor.isPresent()) {
+            return ResponseEntity.ok(profesor.get());
+        } 
+        // 3. Si no existe, devolvemos el error que tú quieres (404)
+        else {
+            return ResponseEntity.status(404).body("error de la aplicación: profesor no existe");
+        }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GestionProfesorModel> editar(@PathVariable Long id, @RequestBody GestionProfesorModel detalles) {
-        GestionProfesorModel act = service.actualizarProfesor(id, detalles);
-        return (act != null) ? ResponseEntity.ok(act) : ResponseEntity.notFound().build();
+    public ResponseEntity<?> editar(@PathVariable Long id, @RequestBody GestionProfesorModel p) {
+        try {
+            GestionProfesorModel act = service.actualizar(id, p);
+            return act != null ? ResponseEntity.ok(act) : ResponseEntity.status(404).body("error de la aplicación: no encontrado");
+        } catch (Exception e) { return ResponseEntity.status(400).body("error de la aplicación: fallo al actualizar"); }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarPorId(@PathVariable Long id) {
-        return service.eliminarPorId(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
-    }
-
-    @DeleteMapping("/rut/{rut}")
-    public ResponseEntity<Void> eliminarPorRut(@PathVariable String rut) {
-        return service.eliminarPorRut(rut) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    public ResponseEntity<?> borrar(@PathVariable Long id) {
+        return service.eliminar(id) ? ResponseEntity.noContent().build() : ResponseEntity.status(404).body("error de la aplicación: id inexistente");
     }
 }
