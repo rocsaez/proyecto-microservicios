@@ -1,55 +1,92 @@
 package cl.duoc.gestion_estudiante.service;
 
+import cl.duoc.gestion_estudiante.dto.EstudianteDTO;
+import cl.duoc.gestion_estudiante.dto.EstudianteCreateDTO;
 import cl.duoc.gestion_estudiante.model.GestionEstudianteModel;
 import cl.duoc.gestion_estudiante.repository.GestionEstudianteRepository;
+import cl.duoc.gestion_estudiante.exceptions.RecursoNoEncontradoException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class GestionEstudianteService {
 
+    private static final Logger log = LoggerFactory.getLogger(GestionEstudianteService.class);
     private final GestionEstudianteRepository repository;
 
     public GestionEstudianteService(GestionEstudianteRepository repository) {
         this.repository = repository;
     }
 
-    // Guarda el estudiante en la BD
-    public GestionEstudianteModel guardarEstudiante(GestionEstudianteModel estudiante) {
-        return repository.save(estudiante);
+    public EstudianteDTO guardarEstudiante(EstudianteCreateDTO dto) {
+        log.info("Registrando nuevo estudiante: RUT {}", dto.getRut());
+        GestionEstudianteModel e = new GestionEstudianteModel();
+        e.setNombre(dto.getNombre());
+        e.setRut(dto.getRut());
+        e.setCorreo(dto.getCorreo());
+
+        GestionEstudianteModel guardado = repository.save(e);
+        log.info("Estudiante guardado exitosamente con ID: {}", guardado.getId());
+        return convertirADTO(guardado);
     }
 
-    // Trae la lista completa
-    public List<GestionEstudianteModel> obtenerTodos() {
-        return repository.findAll();
+    public List<EstudianteDTO> obtenerTodos() {
+        log.info("Consultando lista completa de estudiantes");
+        return repository.findAll().stream()
+                .map(this::convertirADTO)
+                .collect(Collectors.toList());
     }
 
-    // Busca por ID
-    public Optional<GestionEstudianteModel> obtenerPorId(Long id) {
-        return repository.findById(id);
+    public EstudianteDTO obtenerPorId(Long id) {
+        return repository.findById(id)
+            .map(this::convertirADTO)
+            .orElseThrow(() -> {
+                log.warn("Búsqueda fallida: ID {} no existe", id);
+                return new RecursoNoEncontradoException("Estudiante no encontrado con ID: " + id);
+            });
     }
 
-    // Lógica para ACTUALIZAR (Manual y tranqui)
-    public GestionEstudianteModel actualizarEstudiante(Long id, GestionEstudianteModel nuevosDatos) {
-        Optional<GestionEstudianteModel> existente = repository.findById(id);
-        if (existente.isPresent()) {
-            GestionEstudianteModel estudiante = existente.get();
-            // Actualizamos los campos uno por uno
-            estudiante.setNombre(nuevosDatos.getNombre());
-            estudiante.setRut(nuevosDatos.getRut());
-            estudiante.setCorreo(nuevosDatos.getCorreo());
-            return repository.save(estudiante);
-        }
-        return null;
+    public EstudianteDTO obtenerPorRut(String rut) {
+        log.info("Buscando estudiante por RUT: {}", rut);
+        return repository.findByRut(rut)
+            .map(this::convertirADTO)
+            .orElseThrow(() -> {
+                log.warn("Búsqueda fallida: RUT {} no encontrado", rut);
+                return new RecursoNoEncontradoException("Estudiante con RUT " + rut + " no encontrado");
+            });
     }
 
-    // Borra de la BD
+    public EstudianteDTO actualizarEstudiante(Long id, EstudianteCreateDTO dto) {
+        GestionEstudianteModel e = repository.findById(id)
+            .orElseThrow(() -> new RecursoNoEncontradoException("No se puede actualizar: ID " + id + " no encontrado"));
+
+        e.setNombre(dto.getNombre());
+        e.setRut(dto.getRut());
+        e.setCorreo(dto.getCorreo());
+        
+        log.info("Estudiante ID {} actualizado correctamente", id);
+        return convertirADTO(repository.save(e));
+    }
+
     public boolean eliminarPorId(Long id) {
         if (repository.existsById(id)) {
             repository.deleteById(id);
+            log.info("Estudiante ID {} eliminado", id);
             return true;
         }
+        log.warn("Intento de eliminación fallido: ID {} no existe", id);
         return false;
+    }
+
+    private EstudianteDTO convertirADTO(GestionEstudianteModel model) {
+        return new EstudianteDTO(
+            model.getId(),
+            model.getNombre(),
+            model.getRut(),
+            model.getCorreo()
+        );
     }
 }

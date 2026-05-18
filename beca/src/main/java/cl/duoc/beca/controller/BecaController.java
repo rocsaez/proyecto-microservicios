@@ -1,45 +1,45 @@
 package cl.duoc.beca.controller;
-import cl.duoc.beca.model.BecaModel;
+
+import cl.duoc.beca.dto.BecaDTO;
+import cl.duoc.beca.dto.BecaCreateDTO;
 import cl.duoc.beca.service.BecaService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.Optional; // ¡Importante!
 
 @RestController
 @RequestMapping("/api/becas")
 public class BecaController {
-    private final BecaService service;
-    public BecaController(BecaService service) { this.service = service; }
 
-    @PostMapping
-    public ResponseEntity<?> crear(@RequestBody BecaModel b) {
-        try { return ResponseEntity.status(201).body(service.guardar(b)); }
-        catch (Exception e) { return ResponseEntity.status(400).body("error de la aplicación: datos inválidos"); }
-    }
+    @Autowired
+    private BecaService service;
 
     @GetMapping
-    public List<BecaModel> listar() { return service.obtenerTodos(); }
+    public ResponseEntity<List<BecaDTO>> listar() { 
+        return ResponseEntity.ok(service.obtenerTodos()); 
+    }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> porId(@PathVariable Long id) {
-        Optional<BecaModel> b = service.obtenerPorId(id);
-        if (b.isPresent()) { return ResponseEntity.ok(b.get()); }
-        else { return ResponseEntity.status(404).body("error de la aplicación: beca no existe"); }
+    public ResponseEntity<BecaDTO> porId(@PathVariable Long id) {
+        return ResponseEntity.ok(service.obtenerPorId(id));
+    }
+
+    @PostMapping
+    public ResponseEntity<BecaDTO> crear(@Valid @RequestBody BecaCreateDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.guardar(dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> editar(@PathVariable Long id, @RequestBody BecaModel b) {
-        try {
-            BecaModel act = service.actualizar(id, b);
-            if (act != null) return ResponseEntity.ok(act);
-            return ResponseEntity.status(404).body("error de la aplicación: no se encontró");
-        } catch (Exception e) { return ResponseEntity.status(400).body("error de la aplicación: fallo al actualizar"); }
+    public ResponseEntity<BecaDTO> editar(@PathVariable Long id, @Valid @RequestBody BecaCreateDTO dto) {
+        return ResponseEntity.ok(service.actualizar(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> borrar(@PathVariable Long id) {
+    public ResponseEntity<Void> borrar(@PathVariable Long id) {
         if (service.eliminar(id)) return ResponseEntity.noContent().build();
-        return ResponseEntity.status(404).body("error de la aplicación: id no existe");
+        return ResponseEntity.notFound().build();
     }
 }

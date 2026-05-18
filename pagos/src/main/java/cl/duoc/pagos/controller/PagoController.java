@@ -1,60 +1,45 @@
 package cl.duoc.pagos.controller;
 
-import cl.duoc.pagos.model.PagoModel;
+import cl.duoc.pagos.dto.PagoDTO;
+import cl.duoc.pagos.dto.PagoCreateDTO;
 import cl.duoc.pagos.service.PagoService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/pagos")
 public class PagoController {
 
-    private final PagoService service;
-
-    public PagoController(PagoService service) {
-        this.service = service;
-    }
-
-    @PostMapping
-    public ResponseEntity<?> crear(@RequestBody PagoModel pago) {
-        try {
-            return ResponseEntity.status(201).body(service.guardar(pago));
-        } catch (Exception e) {
-            return ResponseEntity.status(400).body("error de la aplicación: no se pudo registrar el pago");
-        }
-    }
+    @Autowired
+    private PagoService service;
 
     @GetMapping
-    public List<PagoModel> listar() {
-        return service.obtenerTodos();
+    public ResponseEntity<List<PagoDTO>> listar() {
+        return ResponseEntity.ok(service.obtenerTodos());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> buscar(@PathVariable Long id) {
-        Optional<PagoModel> pago = service.obtenerPorId(id);
-        if (pago.isPresent()) {
-            return ResponseEntity.ok(pago.get());
-        } else {
-            return ResponseEntity.status(404).body("error de la aplicación: pago no encontrado");
-        }
+    public ResponseEntity<PagoDTO> buscar(@PathVariable Long id) {
+        return ResponseEntity.ok(service.obtenerPorId(id));
+    }
+
+    @PostMapping
+    public ResponseEntity<PagoDTO> crear(@Valid @RequestBody PagoCreateDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.guardar(dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> editar(@PathVariable Long id, @RequestBody PagoModel datos) {
-        try {
-            PagoModel act = service.actualizar(id, datos);
-            if (act != null) return ResponseEntity.ok(act);
-            return ResponseEntity.status(404).body("error de la aplicación: id de pago inexistente");
-        } catch (Exception e) {
-            return ResponseEntity.status(400).body("error de la aplicación: datos de pago inválidos");
-        }
+    public ResponseEntity<PagoDTO> editar(@PathVariable Long id, @Valid @RequestBody PagoCreateDTO dto) {
+        return ResponseEntity.ok(service.actualizar(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> borrar(@PathVariable Long id) {
+    public ResponseEntity<Void> borrar(@PathVariable Long id) {
         if (service.eliminar(id)) return ResponseEntity.noContent().build();
-        return ResponseEntity.status(404).body("error de la aplicación: no se encontró el pago para eliminar");
+        return ResponseEntity.notFound().build();
     }
 }

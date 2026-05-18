@@ -1,304 +1,254 @@
 version: '3.8'
 
 services:
-  # --- MÓDULO ASIGNATURAS ---
-  db-asignaturas:
-    image: mysql:8
-    container_name: db-asignaturas
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: universidad_backend
-    ports:
-      - "3314:3306"
-    volumes:
-      - persistencia_db_asignaturas:/var/lib/mysql
-    networks:
-      - red_asignaturas
-
-  ms-asignaturas:
-    build: ./asignaturas
-    container_name: ms-asignaturas
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db-asignaturas
-    networks:
-      - red_asignaturas
-
   # --- MÓDULO ESTUDIANTES ---
   db-estudiantes:
-    image: mysql:8
-    container_name: db-estudiantes
-    environment:
-      MYSQL_ROOT_PASSWORD: root
+    image: mysql:8.0
+    container_name: mysql_servidor
+    environment: &mysql_env
+      MYSQL_ROOT_PASSWORD: clave_maestra_root
       MYSQL_DATABASE: universidad_backend
-    ports:
-      - "3306:3306"
-    volumes:
-      - persistencia_db_estudiantes:/var/lib/mysql
-    networks:
-      - red_estudiantes
+      MYSQL_USER: desarrollador
+      MYSQL_PASSWORD: password_seguro_123
+    ports: ["3306:3306"]
+    networks: [red_estudiantes]
+    volumes: [persistencia_db_estudiantes:/var/lib/mysql]
 
-  ms-estudiantes:
-    build: ./estudiantes
-    container_name: ms-estudiantes
-    ports:
-      - "8081:8081"
-    depends_on:
-      - db-estudiantes
-    networks:
-      - red_estudiantes
+  workspace-java: 
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_programacion1
+    ports: ["8081:8081"]
+    depends_on: [db-estudiantes]
+    networks: [red_estudiantes, red_universidad]
+    command: tail -f /dev/null
+    # CAMBIO: Usamos gestion-estudiante según tu imagen
+    volumes: ["./gestion-estudiante:/app"]
+    working_dir: /app
 
   # --- MÓDULO PROFESORES ---
-  db-profesores:
-    image: mysql:8
-    container_name: db-profesores
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: universidad_backend
-    ports:
-      - "3307:3306"
-    volumes:
-      - persistencia_db_profesores:/var/lib/mysql
-    networks:
-      - red_profesores
+  db-profesor:
+    image: mysql:8.0
+    container_name: mysql_profesor
+    environment: *mysql_env
+    ports: ["3307:3306"]
+    networks: [red_profesores]
+    volumes: [persistencia_db_profesor:/var/lib/mysql]
 
-  ms-profesores:
-    build: ./profesores
-    container_name: ms-profesores
-    ports:
-      - "8082:8082"
-    depends_on:
-      - db-profesores
-    networks:
-      - red_profesores
+  workspace-profesor:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_profesor
+    ports: ["8082:8082"]
+    depends_on: [db-profesor]
+    networks: [red_profesores, red_universidad]
+    command: tail -f /dev/null
+    # CAMBIO: Usamos gestion-profesor
+    volumes: ["./gestion-profesor:/app"]
+    working_dir: /app
+
+  # --- MÓDULO BIBLIOTECA ---
+  db-biblioteca:
+    image: mysql:8.0
+    container_name: mysql_biblioteca
+    environment: *mysql_env
+    ports: ["3308:3306"]
+    networks: [red_biblioteca]
+    volumes: [persistencia_db_biblioteca:/var/lib/mysql]
+
+  workspace-biblioteca:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_biblioteca
+    ports: ["8083:8083"]
+    depends_on: [db-biblioteca]
+    networks: [red_biblioteca, red_universidad]
+    command: tail -f /dev/null
+    # CAMBIO: Usamos sistema-biblioteca
+    volumes: ["./sistema-biblioteca:/app"]
+    working_dir: /app
 
   # --- MÓDULO EVALUACIÓN ---
   db-evaluacion:
-    image: mysql:8
-    container_name: db-evaluacion
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: universidad_backend
-    ports:
-      - "3309:3306"
-    volumes:
-      - persistencia_db_evaluacion:/var/lib/mysql
-    networks:
-      - red_evaluacion
+    image: mysql:8.0
+    container_name: mysql_evaluacion
+    environment: *mysql_env
+    ports: ["3309:3306"]
+    networks: [red_evaluacion]
+    volumes: [persistencia_db_evaluacion:/var/lib/mysql]
 
-  ms-evaluacion:
-    build: ./evaluacion
-    container_name: ms-evaluacion
-    ports:
-      - "8084:8084"
-    depends_on:
-      - db-evaluacion
-    networks:
-      - red_evaluacion
-
-  # --- MÓDULO CARRERA ---
-  db-carrera:
-    image: mysql:8
-    container_name: db-carrera
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: universidad_backend
-    ports:
-      - "3315:3306"
-    volumes:
-      - persistencia_db_carrera:/var/lib/mysql
-    networks:
-      - red_carrera
-
-  ms-carrera:
-    build: ./carrera
-    container_name: ms-carrera
-    ports:
-      - "8089:8089"
-    depends_on:
-      - db-carrera
-    networks:
-      - red_carrera
-
-  # --- MÓDULO PAGOS ---
-  db-pagos:
-    image: mysql:8
-    container_name: db-pagos
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: universidad_backend
-    ports:
-      - "3316:3306"
-    volumes:
-      - persistencia_db_pagos:/var/lib/mysql
-    networks:
-      - red_pagos
-
-  ms-pagos:
-    build: ./pagos
-    container_name: ms-pagos
-    ports:
-      - "8090:8090"
-    depends_on:
-      - db-pagos
-    networks:
-      - red_pagos
-
-# --- MÓDULO BIBLIOTECA ---
-  db-biblioteca:
-    image: mysql:8
-    container_name: db-biblioteca
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: universidad_backend
-    ports:
-      - "3308:3306"
-    volumes:
-      - persistencia_db_biblioteca:/var/lib/mysql
-    networks:
-      - red_biblioteca
-
-  ms-biblioteca:
-    build: ./biblioteca
-    container_name: ms-biblioteca
-    ports:
-      - "8083:8083"
-    depends_on:
-      - db-biblioteca
-    networks:
-      - red_biblioteca
+  workspace-evaluacion:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_evaluacion
+    ports: ["8084:8084"]
+    depends_on: [db-evaluacion]
+    networks: [red_evaluacion, red_universidad]
+    command: tail -f /dev/null
+    # CAMBIO: Usamos sistema-evaluacion
+    volumes: ["./sistema-evaluacion:/app"]
+    working_dir: /app
 
   # --- MÓDULO INSCRIPCIONES ---
-  db-inscripciones:
-    image: mysql:8
-    container_name: db-inscripciones
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: universidad_backend
-    ports:
-      - "3310:3306"
-    volumes:
-      - persistencia_db_inscripciones:/var/lib/mysql
-    networks:
-      - red_inscripciones
+  db-inscripcion:
+    image: mysql:8.0
+    container_name: mysql_inscripcion
+    environment: *mysql_env
+    ports: ["3310:3306"]
+    networks: [red_inscripcion]
+    volumes: [persistencia_db_inscripcion:/var/lib/mysql]
 
-  ms-inscripciones:
-    build: ./inscripciones
-    container_name: ms-inscripciones
-    ports:
-      - "8085:8085"
-    depends_on:
-      - db-inscripciones
-    networks:
-      - red_inscripciones
+  workspace-inscripcion:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_inscripcion
+    ports: ["8085:8085"]
+    depends_on: [db-inscripcion]
+    networks: [red_inscripcion, red_universidad]
+    command: tail -f /dev/null
+    # CAMBIO: Usamos sistema-inscripcion
+    volumes: ["./sistema-inscripcion:/app"]
+    working_dir: /app
 
   # --- MÓDULO BECAS ---
-  db-becas:
-    image: mysql:8
-    container_name: db-becas
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: universidad_backend
-    ports:
-      - "3311:3306"
-    volumes:
-      - persistencia_db_becas:/var/lib/mysql
-    networks:
-      - red_becas
+  db-beca:
+    image: mysql:8.0
+    container_name: mysql_beca
+    environment: *mysql_env
+    ports: ["3311:3306"]
+    networks: [red_becas]
+    volumes: [persistencia_db_beca:/var/lib/mysql]
 
-  ms-becas:
-    build: ./becas
-    container_name: ms-becas
-    ports:
-      - "8086:8086"
-    depends_on:
-      - db-becas
-    networks:
-      - red_becas
+  workspace-beca:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_beca
+    ports: ["8086:8086"]
+    depends_on: [db-beca]
+    networks: [red_becas, red_universidad]
+    command: tail -f /dev/null
+    # CAMBIO: Según tu imagen la carpeta es 'becas'
+    volumes: ["./becas:/app"]
+    working_dir: /app
 
   # --- MÓDULO SALAS ---
-  db-salas:
-    image: mysql:8
-    container_name: db-salas
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: universidad_backend
-    ports:
-      - "3312:3306"
-    volumes:
-      - persistencia_db_salas:/var/lib/mysql
-    networks:
-      - red_salas
+  db-sala:
+    image: mysql:8.0
+    container_name: mysql_sala
+    environment: *mysql_env
+    ports: ["3312:3306"]
+    networks: [red_salas]
+    volumes: [persistencia_db_sala:/var/lib/mysql]
 
-  ms-salas:
-    build: ./salas
-    container_name: ms-salas
-    ports:
-      - "8087:8087"
-    depends_on:
-      - db-salas
-    networks:
-      - red_salas
+  workspace-sala:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_sala
+    ports: ["8087:8087"]
+    depends_on: [db-sala]
+    networks: [red_salas, red_universidad]
+    command: tail -f /dev/null
+    # CAMBIO: Usamos gestion-sala
+    volumes: ["./gestion-sala:/app"]
+    working_dir: /app
 
   # --- MÓDULO ASISTENCIA ---
   db-asistencia:
-    image: mysql:8
-    container_name: db-asistencia
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: universidad_backend
-    ports:
-      - "3313:3306"
-    volumes:
-      - persistencia_db_asistencia:/var/lib/mysql
-    networks:
-      - red_asistencia
+    image: mysql:8.0
+    container_name: mysql_asistencia
+    environment: *mysql_env
+    ports: ["3313:3306"]
+    networks: [red_asistencia]
+    volumes: [persistencia_db_asistencia:/var/lib/mysql]
 
-  ms-asistencia:
-    build: ./asistencia
-    container_name: ms-asistencia
-    ports:
-      - "8088:8088"
-    depends_on:
-      - db-asistencia
-    networks:
-      - red_asistencia
+  workspace-asistencia:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_asistencia
+    ports: ["8088:8088"]
+    depends_on: [db-asistencia]
+    networks: [red_asistencia, red_universidad]
+    command: tail -f /dev/null
+    # CAMBIO: Usamos sistema-asistencia
+    volumes: ["./sistema-asistencia:/app"]
+    working_dir: /app
 
-# DEFINICIÓN GLOBAL DE REDES Y VOLÚMENES
+  # --- MÓDULO CARRERA ---
+  db-carrera:
+    image: mysql:8.0
+    container_name: mysql_carrera
+    environment: *mysql_env
+    ports: ["3315:3306"]
+    networks: [red_carrera]
+    volumes: [persistencia_db_carrera:/var/lib/mysql]
+
+  workspace-carrera:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_carrera
+    ports: ["8089:8089"]
+    depends_on: [db-carrera]
+    networks: [red_carrera, red_universidad]
+    command: tail -f /dev/null
+    # CAMBIO: Usamos carrera
+    volumes: ["./carrera:/app"]
+    working_dir: /app
+
+  # --- MÓDULO PAGOS ---
+  db-pagos:
+    image: mysql:8.0
+    container_name: mysql_pagos
+    environment: *mysql_env
+    ports: ["3316:3306"]
+    networks: [red_pagos]
+    volumes: [persistencia_db_pagos:/var/lib/mysql]
+
+  workspace-pagos:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_pagos
+    ports: ["8090:8090"]
+    depends_on: [db-pagos]
+    networks: [red_pagos, red_universidad]
+    command: tail -f /dev/null
+    # CAMBIO: Usamos pagos
+    volumes: ["./pagos:/app"]
+    working_dir: /app
+
+  # --- MÓDULO ASIGNATURAS ---
+  db-asignaturas:
+    image: mysql:8.0
+    container_name: mysql_asignaturas
+    environment: *mysql_env
+    ports: ["3314:3306"]
+    networks: [red_asignaturas]
+    volumes: [persistencia_db_asignaturas:/var/lib/mysql]
+
+  workspace-asignaturas:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_asignaturas
+    ports: ["8080:8080"]
+    depends_on: [db-asignaturas]
+    networks: [red_asignaturas, red_universidad]
+    command: tail -f /dev/null
+    # CAMBIO: Usamos asignaturas
+    volumes: ["./asignaturas:/app"]
+    working_dir: /app
+
 networks:
+  red_universidad: # Esta red une a todos los microservicios
   red_asignaturas:
-    driver: bridge
-  red_estudiantes:
-    driver: bridge
-  red_profesores:
-    driver: bridge
-  red_evaluacion:
-    driver: bridge
-  red_carrera:
-    driver: bridge
-  red_pagos:
-    driver: bridge
-  red_biblioteca:
-    driver: bridge
-  red_inscripciones:
-    driver: bridge
   red_becas:
-    driver: bridge
+  red_carrera:
+  red_interna_proyecto:
+  red_profesores:
   red_salas:
-    driver: bridge
+  red_pagos:
   red_asistencia:
-    driver: bridge
+  red_biblioteca:
+  red_evaluacion:
+  red_inscripcion:
+  red_estudiantes:
 
 volumes:
   persistencia_db_asignaturas:
-  persistencia_db_estudiantes:
-  persistencia_db_profesores:
-  persistencia_db_evaluacion:
+  persistencia_db_beca:
   persistencia_db_carrera:
+  persistencia_db_estudiantes:
+  persistencia_db_profesor:
+  persistencia_db_sala:
   persistencia_db_pagos:
-  persistencia_db_biblioteca:
-  persistencia_db_inscripciones:
-  persistencia_db_becas:
-  persistencia_db_salas:
   persistencia_db_asistencia:
+  persistencia_db_biblioteca:
+  persistencia_db_evaluacion:
+  persistencia_db_inscripcion:
