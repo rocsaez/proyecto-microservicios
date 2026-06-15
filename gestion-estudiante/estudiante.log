@@ -1,0 +1,88 @@
+nohup: ignoring input
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m---------------------< [0;36mcl.duoc:gestion-estudiante[0;1m >---------------------[m
+[[1;34mINFO[m] [1mBuilding gestion-estudiante 0.0.1-SNAPSHOT[m
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m>>> [0;32mspring-boot-maven-plugin:3.5.14:run[m [1m(default-cli)[0;1m > [0;1mtest-compile[m @ [36mgestion-estudiante[0;1m >>>[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:3.3.1:resources[m [1m(default-resources)[m @ [36mgestion-estudiante[0;1m ---[m
+[[1;34mINFO[m] Copying 1 resource from src/main/resources to target/classes
+[[1;34mINFO[m] Copying 0 resource from src/main/resources to target/classes
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.14.1:compile[m [1m(default-compile)[m @ [36mgestion-estudiante[0;1m ---[m
+[[1;34mINFO[m] Nothing to compile - all classes are up to date.
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:3.3.1:testResources[m [1m(default-testResources)[m @ [36mgestion-estudiante[0;1m ---[m
+[[1;34mINFO[m] skip non existing resourceDirectory /home/ubuntu/proyecto/gestion-estudiante/src/test/resources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.14.1:testCompile[m [1m(default-testCompile)[m @ [36mgestion-estudiante[0;1m ---[m
+[[1;34mINFO[m] Nothing to compile - all classes are up to date.
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m<<< [0;32mspring-boot-maven-plugin:3.5.14:run[m [1m(default-cli)[0;1m < [0;1mtest-compile[m @ [36mgestion-estudiante[0;1m <<<[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mspring-boot-maven-plugin:3.5.14:run[m [1m(default-cli)[m @ [36mgestion-estudiante[0;1m ---[m
+[[1;34mINFO[m] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.14)
+
+2026-06-01T20:21:01.839Z  INFO 11783 --- [gestion-estudiante] [           main] c.d.g.GestionEstudianteApplication       : Starting GestionEstudianteApplication using Java 21.0.11 with PID 11783 (/home/ubuntu/proyecto/gestion-estudiante/target/classes started by ubuntu in /home/ubuntu/proyecto/gestion-estudiante)
+2026-06-01T20:21:01.843Z  INFO 11783 --- [gestion-estudiante] [           main] c.d.g.GestionEstudianteApplication       : No active profile set, falling back to 1 default profile: "default"
+2026-06-01T20:21:02.942Z  INFO 11783 --- [gestion-estudiante] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-06-01T20:21:03.010Z  INFO 11783 --- [gestion-estudiante] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 53 ms. Found 1 JPA repository interface.
+2026-06-01T20:21:03.669Z  INFO 11783 --- [gestion-estudiante] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8081 (http)
+2026-06-01T20:21:03.691Z  INFO 11783 --- [gestion-estudiante] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-06-01T20:21:03.692Z  INFO 11783 --- [gestion-estudiante] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.54]
+2026-06-01T20:21:03.748Z  INFO 11783 --- [gestion-estudiante] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-06-01T20:21:03.750Z  INFO 11783 --- [gestion-estudiante] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1825 ms
+2026-06-01T20:21:03.973Z  INFO 11783 --- [gestion-estudiante] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-06-01T20:21:04.031Z  INFO 11783 --- [gestion-estudiante] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.49.Final
+2026-06-01T20:21:04.070Z  INFO 11783 --- [gestion-estudiante] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-06-01T20:21:04.423Z  INFO 11783 --- [gestion-estudiante] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-06-01T20:21:04.475Z  INFO 11783 --- [gestion-estudiante] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-06-01T20:21:05.089Z  INFO 11783 --- [gestion-estudiante] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@7dd3981e
+2026-06-01T20:21:05.092Z  INFO 11783 --- [gestion-estudiante] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-06-01T20:21:05.287Z  INFO 11783 --- [gestion-estudiante] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0.45
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-06-01T20:21:07.626Z  INFO 11783 --- [gestion-estudiante] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-06-01T20:21:07.752Z  INFO 11783 --- [gestion-estudiante] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-06-01T20:21:08.705Z  WARN 11783 --- [gestion-estudiante] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-01T20:21:09.831Z  INFO 11783 --- [gestion-estudiante] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8081 (http) with context path '/'
+2026-06-01T20:21:09.905Z  INFO 11783 --- [gestion-estudiante] [           main] c.d.g.GestionEstudianteApplication       : Started GestionEstudianteApplication in 8.686 seconds (process running for 9.144)
+2026-06-01T20:25:50.237Z  INFO 11783 --- [gestion-estudiante] [nio-8081-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-06-01T20:25:50.237Z  INFO 11783 --- [gestion-estudiante] [nio-8081-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-06-01T20:25:50.239Z  INFO 11783 --- [gestion-estudiante] [nio-8081-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-06-01T20:25:50.290Z  INFO 11783 --- [gestion-estudiante] [nio-8081-exec-2] c.d.g.service.GestionEstudianteService   : Consultando lista completa de estudiantes
+Hibernate: select gem1_0.id,gem1_0.correo,gem1_0.nombre,gem1_0.rut from gestion_estudiante_model gem1_0
+2026-06-01T20:37:33.704Z  INFO 11783 --- [gestion-estudiante] [nio-8081-exec-1] c.d.g.service.GestionEstudianteService   : Consultando lista completa de estudiantes
+Hibernate: select gem1_0.id,gem1_0.correo,gem1_0.nombre,gem1_0.rut from gestion_estudiante_model gem1_0
+2026-06-01T20:52:36.566Z  INFO 11783 --- [gestion-estudiante] [nio-8081-exec-5] c.d.g.service.GestionEstudianteService   : Consultando lista completa de estudiantes
+Hibernate: select gem1_0.id,gem1_0.correo,gem1_0.nombre,gem1_0.rut from gestion_estudiante_model gem1_0
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1;31mBUILD FAILURE[m
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] Total time:  40:16 min
+[[1;34mINFO[m] Finished at: 2026-06-01T21:01:14Z
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;31mERROR[m] Failed to execute goal [32morg.springframework.boot:spring-boot-maven-plugin:3.5.14:run[m [1m(default-cli)[m on project [36mgestion-estudiante[m: [1;31mProcess terminated with exit code: 137[m -> [1m[Help 1][m
+[[1;31mERROR[m] 
+[[1;31mERROR[m] To see the full stack trace of the errors, re-run Maven with the [1m-e[m switch.
+[[1;31mERROR[m] Re-run Maven using the [1m-X[m switch to enable full debug logging.
+[[1;31mERROR[m] 
+[[1;31mERROR[m] For more information about the errors and possible solutions, please read the following articles:
+[[1;31mERROR[m] [1m[Help 1][m http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException

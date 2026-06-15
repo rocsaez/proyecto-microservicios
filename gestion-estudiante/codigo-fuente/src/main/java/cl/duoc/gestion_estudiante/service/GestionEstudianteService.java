@@ -88,9 +88,5 @@ public class GestionEstudianteService {
             model.getRut(),
             model.getCorreo()
         );
- 
-   }
-
-
-  
+    }
 }

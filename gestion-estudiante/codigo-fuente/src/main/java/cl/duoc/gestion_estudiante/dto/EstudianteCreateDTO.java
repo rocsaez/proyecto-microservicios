@@ -1,6 +1,5 @@
 package cl.duoc.gestion_estudiante.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema; // <-- Importación de Swagger
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -9,23 +8,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Schema(description = "Modelo de datos requerido para crear o actualizar el registro de un estudiante")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class EstudianteCreateDTO {
 
-    @Schema(description = "Nombre completo del estudiante", example = "Juan Pérez")
     @NotBlank(message = "El nombre es obligatorio")
     @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres")
     private String nombre;
 
-    @Schema(description = "RUT único del estudiante con guión y dígito verificador", example = "19283746-K")
     @NotBlank(message = "El RUT es obligatorio")
     @Pattern(regexp = "^[0-9]{7,8}-[0-9Kk]$", message = "Formato de RUT inválido (ej: 12345678-9)")
     private String rut;
 
-    @Schema(description = "Correo electrónico institucional del estudiante", example = "juan.perez@duocuc.cl")
     @NotBlank(message = "El correo es obligatorio")
     @Email(message = "El formato del correo no es válido")
     private String correo;
