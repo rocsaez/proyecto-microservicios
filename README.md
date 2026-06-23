@@ -40,8 +40,8 @@ Todas las APIs se encuentran completamente auto-documentadas mediante SpringDoc.
 
 ### 3. Gestión Profesor (`Port: 8082`)
 * **Context Path Base:** `/api/profesores`
-* **Operaciones principales:** Mantenimiento integral de la planta docente (Creación, lectura, edición y borrado lógico/físico).
-* **Enlace Swagger UI:** *(Módulo Core sin UI expuesta directamente)*
+* **Operaciones principales:** Mantenimiento integral de la planta docente mediante endpoints interactivos de consulta general, registro con validaciones de campos, búsquedas por ID único, actualizaciones de perfiles y borrado físico/lógico.
+* **Enlace Swagger UI:** [http://localhost:8082/doc/swagger-ui.html](http://localhost:8082/doc/swagger-ui.html)
 
 ### 4. Sistema Biblioteca (`Port: 8083`)
 * **Context Path Base:** `/api/biblioteca`
