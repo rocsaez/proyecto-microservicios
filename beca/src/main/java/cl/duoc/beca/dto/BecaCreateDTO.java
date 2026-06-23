@@ -21,11 +21,11 @@ public class BecaCreateDTO {
     @Pattern(regexp = "^[0-9]{7,8}-[0-9Kk]$", message = "Formato de RUT inválido (ej: 12345678-9)")
     private String rutEstudiante;
 
-    @NotNull(message = "El porcentaje es obligatorio")
-    @Min(value = 1, message = "El descuento mínimo es 1%")
-    @Max(value = 100, message = "El descuento no puede superar el 100%")
+   @NotNull(message = "El porcentaje es obligatorio")
+    @jakarta.validation.constraints.DecimalMin(value = "1.0", message = "El descuento mínimo es 1%")
+    @jakarta.validation.constraints.DecimalMax(value = "100.0", message = "El descuento no puede superar el 100%")
     private Double porcentajeDescuento;
-
+    
     @NotBlank(message = "El estado es obligatorio (Ej: Activo/Inactivo)")
     private String estado;
 }

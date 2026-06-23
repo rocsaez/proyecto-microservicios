@@ -34,14 +34,12 @@ public class AsignaturaService {
     public AsignaturaDTO guardar(AsignaturaCreateDTO dto) {
         log.info("Iniciando creación de asignatura: {}", dto.getNombre());
         
-        validarCarrera(dto.getCodigoCarrera());
-        validarProfesor(dto.getIdProfesor());
-
         AsignaturaModel asig = new AsignaturaModel();
         asig.setNombre(dto.getNombre());
         asig.setSigla(dto.getSigla());
         asig.setCreditos(dto.getCreditos());
-        // asig.setIdProfesor(dto.getIdProfesor()); // Activa si existe en tu Model
+        asig.setCodigoCarrera(dto.getCodigoCarrera());
+        asig.setIdProfesor(dto.getIdProfesor());
 
         AsignaturaModel guardado = repository.save(asig);
         log.info("Asignatura guardada exitosamente con ID: {}", guardado.getId());
@@ -52,40 +50,13 @@ public class AsignaturaService {
         AsignaturaModel asig = repository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Asignatura no encontrada con ID: " + id));
         
-        validarCarrera(dto.getCodigoCarrera());
-        validarProfesor(dto.getIdProfesor());
-        
         asig.setNombre(dto.getNombre());
         asig.setSigla(dto.getSigla());
         asig.setCreditos(dto.getCreditos());
+        asig.setCodigoCarrera(dto.getCodigoCarrera());
+        asig.setIdProfesor(dto.getIdProfesor());
         
         return convertirADTO(repository.save(asig));
-    }
-
-    private void validarCarrera(String codigo) {
-        try {
-            log.info("Validando carrera con código: {}", codigo);
-            carreraClient.buscarPorCodigo(codigo);
-        } catch (FeignException.NotFound e) {
-            log.warn("Carrera código {} no encontrada", codigo);
-            throw new RecursoNoEncontradoException("La carrera con código " + codigo + " no existe.");
-        } catch (FeignException e) {
-            log.error("Error de conexión con microservicio Carreras: {}", e.getMessage());
-            throw new ServicioNoDisponibleException("Servicio de Carreras no disponible.");
-        }
-    }
-
-    private void validarProfesor(Long id) {
-        try {
-            log.info("Validando profesor con ID: {}", id);
-            profesorClient.obtenerProfesor(id);
-        } catch (FeignException.NotFound e) {
-            log.warn("Profesor ID {} no encontrado", id);
-            throw new RecursoNoEncontradoException("El profesor con ID " + id + " no existe.");
-        } catch (FeignException e) {
-            log.error("Error de conexión con microservicio Profesores: {}", e.getMessage());
-            throw new ServicioNoDisponibleException("Servicio de Profesores no disponible.");
-        }
     }
 
     public List<AsignaturaDTO> obtenerTodas() {
@@ -106,14 +77,15 @@ public class AsignaturaService {
         return convertirADTO(model);
     }
 
-    public boolean eliminar(Long id) {
-        if (repository.existsById(id)) {
-            repository.deleteById(id);
-            log.info("Asignatura ID {} eliminada", id);
-            return true;
+    public void eliminar(Long id) {
+        log.info("Solicitud para eliminar asignatura ID: {}", id);
+        if (!repository.existsById(id)) {
+            throw new RecursoNoEncontradoException("Asignatura no encontrada con ID: " + id);
         }
-        return false;
+        repository.deleteById(id);
+        log.info("Asignatura ID {} eliminada con éxito", id);
     }
+    
 
     private AsignaturaDTO convertirADTO(AsignaturaModel model) {
         return new AsignaturaDTO(
@@ -121,7 +93,10 @@ public class AsignaturaService {
             model.getNombre(),
             model.getSigla(),
             model.getCreditos(),
-            "VALIDADO"
+            model.getCodigoCarrera(),
+            model.getIdProfesor()
+
+        
         );
     }
 }

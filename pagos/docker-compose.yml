@@ -7,11 +7,11 @@ services:
     container_name: mysql_pagos
     environment:
       MYSQL_ROOT_PASSWORD: clave_maestra_root
-      MYSQL_DATABASE: universidad_backend
+      MYSQL_DATABASE: pagos_db  # <-- CORREGIDO: Base de datos única
       MYSQL_USER: desarrollador
       MYSQL_PASSWORD: password_seguro_123
     ports:
-      - "3316:3306"  # Puerto DB Host
+      - "3316:3306"
     networks:
       - red_pagos
     volumes:
@@ -24,18 +24,20 @@ services:
     image: maven:3.9-eclipse-temurin-21
     container_name: entorno_pagos
     ports:
-      - "8090:8090" # El microservicio correrá en el puerto 8090
+      - "8090:8090"
     depends_on:
       - db-pagos
     networks:
       - red_pagos
+      - red_universidad  # Agregada para permitir que se conecte con Estudiantes y Becas vía Feign
     command: tail -f /dev/null
     volumes:
-      - ./src:/app/src
-      - ./pom.xml:/app/pom.xml
+      - ./pagos:/app # CORREGIDO: Apunta a la carpeta del módulo de pagos
 
 networks:
   red_pagos:
+    driver: bridge
+  red_universidad:
     driver: bridge
 
 volumes:

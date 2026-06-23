@@ -23,6 +23,12 @@ public class GestionEstudianteService {
 
     public EstudianteDTO guardarEstudiante(EstudianteCreateDTO dto) {
         log.info("Registrando nuevo estudiante: RUT {}", dto.getRut());
+        
+        // Corta de inmediato lanzando la excepción si el RUT existe
+        if (repository.findByRut(dto.getRut()).isPresent()) {
+            throw new IllegalArgumentException("El RUT ingresado ya está registrado en el sistema.");
+        }
+
         GestionEstudianteModel e = new GestionEstudianteModel();
         e.setNombre(dto.getNombre());
         e.setRut(dto.getRut());
@@ -71,14 +77,14 @@ public class GestionEstudianteService {
         return convertirADTO(repository.save(e));
     }
 
-    public boolean eliminarPorId(Long id) {
-        if (repository.existsById(id)) {
-            repository.deleteById(id);
-            log.info("Estudiante ID {} eliminado", id);
-            return true;
+    public void eliminarPorId(Long id) {
+        log.info("Intentando eliminar estudiante con ID: {}", id);
+        if (!repository.existsById(id)) {
+            log.warn("Intento de eliminación fallido: ID {} no existe", id);
+            throw new RecursoNoEncontradoException("No se puede eliminar: ID " + id + " no encontrado");
         }
-        log.warn("Intento de eliminación fallido: ID {} no existe", id);
-        return false;
+        repository.deleteById(id);
+        log.info("Estudiante ID {} eliminado exitosamente", id);
     }
 
     private EstudianteDTO convertirADTO(GestionEstudianteModel model) {
@@ -88,9 +94,5 @@ public class GestionEstudianteService {
             model.getRut(),
             model.getCorreo()
         );
- 
-   }
-
-
-  
+    }
 }

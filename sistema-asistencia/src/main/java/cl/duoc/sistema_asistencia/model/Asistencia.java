@@ -1,19 +1,27 @@
 package cl.duoc.sistema_asistencia.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "asistencias")
 @Data
-public class AsistenciaModel {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Asistencia {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @Column(nullable = false)
     private String rutEstudiante;
+    
+    @Column(nullable = false)
     private String codigoClase;
+    
+    @Column(nullable = false)
     private LocalDateTime fechaHora;
 
     @PrePersist

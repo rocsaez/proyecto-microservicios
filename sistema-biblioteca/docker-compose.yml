@@ -1,11 +1,13 @@
-
 services:
+  # ------------------------------------------------------------------
+  # CONTENEDOR 1: LA BASE DE DATOS MYSQL PARA EL SISTEMA DE BIBLIOTECA
+  # ------------------------------------------------------------------
   db-biblioteca:
     image: mysql:8.0
     container_name: mysql_biblioteca
     environment:
       MYSQL_ROOT_PASSWORD: clave_maestra_root
-      MYSQL_DATABASE: universidad_backend
+      MYSQL_DATABASE: biblioteca_db  # <-- CORREGIDO: Base de datos única
       MYSQL_USER: desarrollador
       MYSQL_PASSWORD: password_seguro_123
     ports:
@@ -15,6 +17,9 @@ services:
     volumes:
       - persistencia_db_biblioteca:/var/lib/mysql
 
+  # ------------------------------------------------------------------
+  # CONTENEDOR 2: EL ENTORNO DE TRABAJO JAVA/SPRING BOOT
+  # ------------------------------------------------------------------
   workspace-biblioteca:
     image: maven:3.9-eclipse-temurin-21
     container_name: entorno_biblioteca
@@ -24,12 +29,15 @@ services:
       - db-biblioteca
     networks:
       - red_biblioteca
+      - red_universidad  # Agregada para habilitar las peticiones Feign salientes a Estudiantes
     command: tail -f /dev/null
     volumes:
-      - ./codigo-fuente:/app
+      - ./sistema-biblioteca:/app # CORREGIDO: Apunta a la carpeta del módulo de biblioteca
 
 networks:
   red_biblioteca:
+    driver: bridge
+  red_universidad:
     driver: bridge
 
 volumes:

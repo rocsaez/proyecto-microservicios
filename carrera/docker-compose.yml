@@ -7,11 +7,11 @@ services:
     container_name: mysql_carrera
     environment:
       MYSQL_ROOT_PASSWORD: clave_maestra_root
-      MYSQL_DATABASE: universidad_backend
+      MYSQL_DATABASE: carrera_db  # <-- BD independiente cumplida
       MYSQL_USER: desarrollador
       MYSQL_PASSWORD: password_seguro_123
     ports:
-      - "3315:3306"  # Puerto DB Host
+      - "3315:3306"
     networks:
       - red_carrera
     volumes:
@@ -24,18 +24,21 @@ services:
     image: maven:3.9-eclipse-temurin-21
     container_name: entorno_carrera
     ports:
-      - "8089:8089" # El microservicio correrá en el puerto 8089
+      - "8089:8089"
     depends_on:
       - db-carrera
     networks:
       - red_carrera
+      - red_universidad  # <-- IMPORTANTE: Permite recibir llamadas Feign de Asignaturas
     command: tail -f /dev/null
     volumes:
-      - ./src:/app/src
-      - ./pom.xml:/app/pom.xml
+      - .:/app           # <-- CORREGIDO: Mapea la carpeta completa
+    working_dir: /app    # <-- CORREGIDO: Inicia directo en la raíz de la app
 
 networks:
   red_carrera:
+    driver: bridge
+  red_universidad:
     driver: bridge
 
 volumes:

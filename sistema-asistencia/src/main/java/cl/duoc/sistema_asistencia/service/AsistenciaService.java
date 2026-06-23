@@ -1,14 +1,10 @@
 package cl.duoc.sistema_asistencia.service;
 
-import cl.duoc.sistema_asistencia.client.EstudianteClient;
-import cl.duoc.sistema_asistencia.client.InscripcionClient;
-import cl.duoc.sistema_asistencia.dto.AsistenciaDTO;
 import cl.duoc.sistema_asistencia.dto.AsistenciaCreateDTO;
-import cl.duoc.sistema_asistencia.model.AsistenciaModel;
-import cl.duoc.sistema_asistencia.repository.AsistenciaRepository;
+import cl.duoc.sistema_asistencia.dto.AsistenciaDTO;
 import cl.duoc.sistema_asistencia.exceptions.RecursoNoEncontradoException;
-import cl.duoc.sistema_asistencia.exceptions.ServicioNoDisponibleException;
-import feign.FeignException;
+import cl.duoc.sistema_asistencia.model.Asistencia;
+import cl.duoc.sistema_asistencia.repository.AsistenciaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,101 +21,57 @@ public class AsistenciaService {
     @Autowired
     private AsistenciaRepository repository;
 
-    @Autowired
-    private EstudianteClient estudianteClient;
-
-    @Autowired
-    private InscripcionClient inscripcionClient;
-
-    public AsistenciaDTO guardar(AsistenciaCreateDTO dto) {
-        log.info("Iniciando registro de asistencia para RUT: {}", dto.getRutEstudiante());
-        
-        // 1. Validar existencia del estudiante
-        validarEstudiante(dto.getRutEstudiante());
-
-        // 2. Validar que tenga inscripciones
-        validarInscripcion(dto.getRutEstudiante());
-
-        AsistenciaModel asistencia = new AsistenciaModel();
-        asistencia.setRutEstudiante(dto.getRutEstudiante());
-        asistencia.setCodigoClase(dto.getCodigoClase());
-
-        AsistenciaModel guardado = repository.save(asistencia);
-        log.info("Asistencia registrada exitosamente. ID: {}", guardado.getId());
-        
-        return convertirADTO(guardado);
-    }
-
-    public AsistenciaDTO actualizar(Long id, AsistenciaCreateDTO dto) {
-        AsistenciaModel asistencia = repository.findById(id)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Asistencia no encontrada con ID: " + id));
-        
-        validarEstudiante(dto.getRutEstudiante());
-        validarInscripcion(dto.getRutEstudiante());
-
-        asistencia.setRutEstudiante(dto.getRutEstudiante());
-        asistencia.setCodigoClase(dto.getCodigoClase());
-        
-        return convertirADTO(repository.save(asistencia));
-    }
-
-    private void validarEstudiante(String rut) {
-        try {
-            log.info("Consultando Micro Estudiantes por RUT: {}", rut);
-            estudianteClient.buscarPorRut(rut);
-        } catch (FeignException.NotFound e) {
-            log.warn("RUT {} no encontrado en Estudiantes", rut);
-            throw new RecursoNoEncontradoException("El estudiante con RUT " + rut + " no existe.");
-        } catch (FeignException e) {
-            log.error("Error de conexión con Estudiantes: {}", e.getMessage());
-            throw new ServicioNoDisponibleException("Servicio de Estudiantes no disponible.");
-        }
-    }
-
-    private void validarInscripcion(String rut) {
-        try {
-            log.info("Validando inscripciones para RUT: {}", rut);
-            var inscripciones = inscripcionClient.obtenerInscripcionesPorRut(rut);
-            if (inscripciones == null || inscripciones.isEmpty()) {
-                log.warn("El estudiante {} no tiene materias inscritas", rut);
-                throw new RecursoNoEncontradoException("El estudiante no registra inscripciones vigentes.");
-            }
-        } catch (FeignException.NotFound e) {
-            log.warn("Inscripciones para RUT {} no encontradas", rut);
-            throw new RecursoNoEncontradoException("No se encontraron registros de inscripción para este RUT.");
-        } catch (FeignException e) {
-            log.error("Error de conexión con Inscripciones: {}", e.getMessage());
-            throw new ServicioNoDisponibleException("Servicio de Inscripciones no disponible.");
-        }
-    }
-
-    public List<AsistenciaDTO> obtenerTodas() {
+    public List<AsistenciaDTO> findAll() {
+        log.info("Consultando todas las asistencias");
         return repository.findAll().stream()
-                .map(this::convertirADTO)
+                .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public AsistenciaDTO obtenerPorId(Long id) {
-        return repository.findById(id)
-                .map(this::convertirADTO)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Asistencia no encontrada con ID: " + id));
+    public AsistenciaDTO findById(Long id) {
+        log.info("Buscando asistencia id={}", id);
+        Asistencia a = repository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Asistencia no encontrada: " + id));
+        log.info("Asistencia encontrada: rutEstudiante={}, clase={}", a.getRutEstudiante(), a.getCodigoClase());
+        return toDTO(a);
     }
 
-    public boolean eliminar(Long id) {
-        if (repository.existsById(id)) {
-            repository.deleteById(id);
-            log.info("Asistencia ID {} eliminada", id);
-            return true;
+    public AsistenciaDTO crear(AsistenciaCreateDTO dto) {
+        log.info("Creando asistencia para estudiante rut={}", dto.getRutEstudiante());
+        Asistencia a = new Asistencia();
+        a.setRutEstudiante(dto.getRutEstudiante());
+        a.setCodigoClase(dto.getCodigoClase()); // Corregido sin tilde
+        
+        Asistencia guardado = repository.save(a);
+        log.info("Asistencia registrada id={}", guardado.getId());
+        return toDTO(guardado);
+    }
+
+    public AsistenciaDTO actualizar(Long id, AsistenciaCreateDTO dto) {
+        log.info("Actualizando asistencia id={}", id);
+        Asistencia a = repository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Asistencia no encontrada: " + id));
+        
+        a.setRutEstudiante(dto.getRutEstudiante());
+        a.setCodigoClase(dto.getCodigoClase()); // Corregido sin tilde
+        return toDTO(repository.save(a));
+    }
+
+    public void eliminar(Long id) {
+        log.info("Eliminando asistencia id={}", id);
+        if (!repository.existsById(id)) {
+            throw new RecursoNoEncontradoException("Asistencia no encontrada: " + id);
         }
-        return false;
+        repository.deleteById(id);
+        log.info("Asistencia id={} eliminada", id);
     }
 
-    private AsistenciaDTO convertirADTO(AsistenciaModel model) {
+    private AsistenciaDTO toDTO(Asistencia a) {
         return new AsistenciaDTO(
-            model.getId(),
-            model.getRutEstudiante(),
-            model.getCodigoClase(),
-            model.getFechaHora()
+                a.getId(),
+                a.getRutEstudiante(),
+                a.getCodigoClase(), // Corregido sin tilde
+                a.getFechaHora()
         );
     }
 }

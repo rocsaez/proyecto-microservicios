@@ -4,7 +4,6 @@ import cl.duoc.gestion_estudiante.dto.EstudianteDTO;
 import cl.duoc.gestion_estudiante.dto.EstudianteCreateDTO;
 import cl.duoc.gestion_estudiante.service.GestionEstudianteService;
 
-// Imports de Swagger/OpenAPI
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -29,7 +28,6 @@ public class GestionEstudianteController {
         this.service = service;
     }
 
-    // 1. CREAR
     @Operation(summary = "Registrar un nuevo estudiante", description = "Crea un registro de estudiante en la base de datos a partir de los datos entregados.")
     @ApiResponse(responseCode = "201", description = "Estudiante creado exitosamente")
     @PostMapping
@@ -38,7 +36,6 @@ public class GestionEstudianteController {
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
     }
 
-    // 2. LEER TODOS
     @Operation(summary = "Listar todos los estudiantes", description = "Retorna una lista con la totalidad de los estudiantes registrados.")
     @ApiResponse(responseCode = "200", description = "Lista obtenida con éxito")
     @GetMapping
@@ -46,7 +43,6 @@ public class GestionEstudianteController {
         return ResponseEntity.ok(service.obtenerTodos());
     }
 
-    // 3. LEER POR ID
     @Operation(summary = "Buscar estudiante por ID", description = "Retorna los datos de un estudiante específico usando su identificador numérico.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Estudiante encontrado"),
@@ -59,7 +55,6 @@ public class GestionEstudianteController {
         return ResponseEntity.ok(service.obtenerPorId(id));
     }
 
-    // 4. ACTUALIZAR
     @Operation(summary = "Actualizar un estudiante existente", description = "Modifica los datos de un estudiante en base a su ID.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Estudiante actualizado exitosamente"),
@@ -73,7 +68,7 @@ public class GestionEstudianteController {
         return ResponseEntity.ok(service.actualizarEstudiante(id, dto));
     }
 
-    // 5. ELIMINAR
+    // CORREGIDO: Removido el IF condicional para unificarlo con el estándar del profesor
     @Operation(summary = "Eliminar estudiante por ID", description = "Remueve permanentemente a un estudiante del sistema por su ID.")
     @ApiResponses({
         @ApiResponse(responseCode = "204", description = "Estudiante eliminado con éxito"),
@@ -83,13 +78,10 @@ public class GestionEstudianteController {
     public ResponseEntity<Void> eliminar(
             @Parameter(description = "ID del estudiante a eliminar", required = true)
             @PathVariable Long id) {
-        if (service.eliminarPorId(id)) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+        service.eliminarPorId(id);
+        return ResponseEntity.noContent().build();
     }
 
-    // BÚSQUEDA FEIGN POR RUT
     @Operation(summary = "Buscar estudiante por RUT", description = "Endpoint de comunicación interna que permite a otros microservicios buscar un alumno por su RUT.")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Estudiante localizado"),

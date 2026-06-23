@@ -1,4 +1,3 @@
-
 services:
   # ------------------------------------------------------------------
   # CONTENEDOR 1: LA BASE DE DATOS MYSQL PARA GESTIÓN DE SALAS
@@ -8,35 +7,38 @@ services:
     container_name: mysql_sala
     environment:
       MYSQL_ROOT_PASSWORD: clave_maestra_root
-      MYSQL_DATABASE: universidad_backend
+      MYSQL_DATABASE: salas_db  # <-- CORREGIDO: Base de datos única
       MYSQL_USER: desarrollador
       MYSQL_PASSWORD: password_seguro_123
     ports:
-      - "3312:3306"  # Puerto 3312 para la base de datos de salas
+      - "3312:3306"
     networks:
       - red_salas
     volumes:
       - persistencia_db_sala:/var/lib/mysql
 
   # ------------------------------------------------------------------
-  # CONTENEDOR 2: ENTORNO JAVA (Lo dejamos por si quieres entrar con bash)
+  # CONTENEDOR 2: ENTORNO JAVA
   # ------------------------------------------------------------------
   workspace-sala:
     image: maven:3.9-eclipse-temurin-21
     container_name: entorno_sala
     ports:
-      - "8087:8087" # El microservicio usará el puerto 8087
+      - "8087:8087"
     depends_on:
       - db-sala
     networks:
       - red_salas
+      - red_universidad 
     command: tail -f /dev/null
     volumes:
-      - ./src:/app/src
-      - ./pom.xml:/app/pom.xml
+
+      - .:/app
 
 networks:
   red_salas:
+    driver: bridge
+  red_universidad:
     driver: bridge
 
 volumes:

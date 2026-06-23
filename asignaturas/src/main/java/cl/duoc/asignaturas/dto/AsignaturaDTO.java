@@ -13,4 +13,5 @@ public class AsignaturaDTO {
     private String sigla;
     private Integer creditos;
     private String codigoCarrera;
+    private Long idProfesor;
 }

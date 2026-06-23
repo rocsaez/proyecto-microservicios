@@ -1,16 +1,18 @@
 version: '3.8'
-
+x-mysql-env: &mysql_env
+  MYSQL_ROOT_PASSWORD: clave_maestra_root
+  MYSQL_USER: desarrollador
+  MYSQL_PASSWORD: password_seguro_123
 services:
+  
   # --- MÓDULO ESTUDIANTES ---
   db-estudiantes:
     image: mysql:8.0
     container_name: mysql_servidor
-    environment: &mysql_env
-      MYSQL_ROOT_PASSWORD: clave_maestra_root
-      MYSQL_DATABASE: universidad_backend
-      MYSQL_USER: desarrollador
-      MYSQL_PASSWORD: password_seguro_123
-    ports: ["3306:3306"]
+    environment:
+      <<: *mysql_env
+      MYSQL_DATABASE: estudiantes_db
+    ports: ["3317:3306"]
     networks: [red_estudiantes]
     volumes: [persistencia_db_estudiantes:/var/lib/mysql]
 
@@ -21,7 +23,6 @@ services:
     depends_on: [db-estudiantes]
     networks: [red_estudiantes, red_universidad]
     command: tail -f /dev/null
-    # CAMBIO: Usamos gestion-estudiante según tu imagen
     volumes: ["./gestion-estudiante:/app"]
     working_dir: /app
 
@@ -29,7 +30,9 @@ services:
   db-profesor:
     image: mysql:8.0
     container_name: mysql_profesor
-    environment: *mysql_env
+    environment:
+      <<: *mysql_env
+      MYSQL_DATABASE: profesores_db
     ports: ["3307:3306"]
     networks: [red_profesores]
     volumes: [persistencia_db_profesor:/var/lib/mysql]
@@ -41,7 +44,6 @@ services:
     depends_on: [db-profesor]
     networks: [red_profesores, red_universidad]
     command: tail -f /dev/null
-    # CAMBIO: Usamos gestion-profesor
     volumes: ["./gestion-profesor:/app"]
     working_dir: /app
 
@@ -49,7 +51,9 @@ services:
   db-biblioteca:
     image: mysql:8.0
     container_name: mysql_biblioteca
-    environment: *mysql_env
+    environment:
+      <<: *mysql_env
+      MYSQL_DATABASE: biblioteca_db
     ports: ["3308:3306"]
     networks: [red_biblioteca]
     volumes: [persistencia_db_biblioteca:/var/lib/mysql]
@@ -61,7 +65,6 @@ services:
     depends_on: [db-biblioteca]
     networks: [red_biblioteca, red_universidad]
     command: tail -f /dev/null
-    # CAMBIO: Usamos sistema-biblioteca
     volumes: ["./sistema-biblioteca:/app"]
     working_dir: /app
 
@@ -69,7 +72,9 @@ services:
   db-evaluacion:
     image: mysql:8.0
     container_name: mysql_evaluacion
-    environment: *mysql_env
+    environment:
+      <<: *mysql_env
+      MYSQL_DATABASE: evaluacion_db
     ports: ["3309:3306"]
     networks: [red_evaluacion]
     volumes: [persistencia_db_evaluacion:/var/lib/mysql]
@@ -81,7 +86,6 @@ services:
     depends_on: [db-evaluacion]
     networks: [red_evaluacion, red_universidad]
     command: tail -f /dev/null
-    # CAMBIO: Usamos sistema-evaluacion
     volumes: ["./sistema-evaluacion:/app"]
     working_dir: /app
 
@@ -89,7 +93,9 @@ services:
   db-inscripcion:
     image: mysql:8.0
     container_name: mysql_inscripcion
-    environment: *mysql_env
+    environment:
+      <<: *mysql_env
+      MYSQL_DATABASE: inscripciones_db
     ports: ["3310:3306"]
     networks: [red_inscripcion]
     volumes: [persistencia_db_inscripcion:/var/lib/mysql]
@@ -101,7 +107,6 @@ services:
     depends_on: [db-inscripcion]
     networks: [red_inscripcion, red_universidad]
     command: tail -f /dev/null
-    # CAMBIO: Usamos sistema-inscripcion
     volumes: ["./sistema-inscripcion:/app"]
     working_dir: /app
 
@@ -109,7 +114,9 @@ services:
   db-beca:
     image: mysql:8.0
     container_name: mysql_beca
-    environment: *mysql_env
+    environment:
+      <<: *mysql_env
+      MYSQL_DATABASE: becas_db
     ports: ["3311:3306"]
     networks: [red_becas]
     volumes: [persistencia_db_beca:/var/lib/mysql]
@@ -121,7 +128,6 @@ services:
     depends_on: [db-beca]
     networks: [red_becas, red_universidad]
     command: tail -f /dev/null
-    # CAMBIO: Según tu imagen la carpeta es 'becas'
     volumes: ["./becas:/app"]
     working_dir: /app
 
@@ -129,7 +135,9 @@ services:
   db-sala:
     image: mysql:8.0
     container_name: mysql_sala
-    environment: *mysql_env
+    environment:
+      <<: *mysql_env
+      MYSQL_DATABASE: salas_db
     ports: ["3312:3306"]
     networks: [red_salas]
     volumes: [persistencia_db_sala:/var/lib/mysql]
@@ -141,7 +149,6 @@ services:
     depends_on: [db-sala]
     networks: [red_salas, red_universidad]
     command: tail -f /dev/null
-    # CAMBIO: Usamos gestion-sala
     volumes: ["./gestion-sala:/app"]
     working_dir: /app
 
@@ -149,7 +156,9 @@ services:
   db-asistencia:
     image: mysql:8.0
     container_name: mysql_asistencia
-    environment: *mysql_env
+    environment:
+      <<: *mysql_env
+      MYSQL_DATABASE: asistencia_db
     ports: ["3313:3306"]
     networks: [red_asistencia]
     volumes: [persistencia_db_asistencia:/var/lib/mysql]
@@ -161,55 +170,16 @@ services:
     depends_on: [db-asistencia]
     networks: [red_asistencia, red_universidad]
     command: tail -f /dev/null
-    # CAMBIO: Usamos sistema-asistencia
     volumes: ["./sistema-asistencia:/app"]
-    working_dir: /app
-
-  # --- MÓDULO CARRERA ---
-  db-carrera:
-    image: mysql:8.0
-    container_name: mysql_carrera
-    environment: *mysql_env
-    ports: ["3315:3306"]
-    networks: [red_carrera]
-    volumes: [persistencia_db_carrera:/var/lib/mysql]
-
-  workspace-carrera:
-    image: maven:3.9-eclipse-temurin-21
-    container_name: entorno_carrera
-    ports: ["8089:8089"]
-    depends_on: [db-carrera]
-    networks: [red_carrera, red_universidad]
-    command: tail -f /dev/null
-    # CAMBIO: Usamos carrera
-    volumes: ["./carrera:/app"]
-    working_dir: /app
-
-  # --- MÓDULO PAGOS ---
-  db-pagos:
-    image: mysql:8.0
-    container_name: mysql_pagos
-    environment: *mysql_env
-    ports: ["3316:3306"]
-    networks: [red_pagos]
-    volumes: [persistencia_db_pagos:/var/lib/mysql]
-
-  workspace-pagos:
-    image: maven:3.9-eclipse-temurin-21
-    container_name: entorno_pagos
-    ports: ["8090:8090"]
-    depends_on: [db-pagos]
-    networks: [red_pagos, red_universidad]
-    command: tail -f /dev/null
-    # CAMBIO: Usamos pagos
-    volumes: ["./pagos:/app"]
     working_dir: /app
 
   # --- MÓDULO ASIGNATURAS ---
   db-asignaturas:
     image: mysql:8.0
     container_name: mysql_asignaturas
-    environment: *mysql_env
+    environment:
+      <<: *mysql_env
+      MYSQL_DATABASE: asignaturas_db
     ports: ["3314:3306"]
     networks: [red_asignaturas]
     volumes: [persistencia_db_asignaturas:/var/lib/mysql]
@@ -221,16 +191,56 @@ services:
     depends_on: [db-asignaturas]
     networks: [red_asignaturas, red_universidad]
     command: tail -f /dev/null
-    # CAMBIO: Usamos asignaturas
     volumes: ["./asignaturas:/app"]
     working_dir: /app
 
+  # --- MÓDULO CARRERA ---
+  db-carrera:
+    image: mysql:8.0
+    container_name: mysql_carrera
+    environment:
+      <<: *mysql_env
+      MYSQL_DATABASE: carrera_db
+    ports: ["3315:3306"]
+    networks: [red_carrera]
+    volumes: [persistencia_db_carrera:/var/lib/mysql]
+
+  workspace-carrera:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_carrera
+    ports: ["8089:8089"]
+    depends_on: [db-carrera]
+    networks: [red_carrera, red_universidad]
+    command: tail -f /dev/null
+    volumes: ["./carrera:/app"]
+    working_dir: /app
+
+  # --- MÓDULO PAGOS ---
+  db-pagos:
+    image: mysql:8.0
+    container_name: mysql_pagos
+    environment:
+      <<: *mysql_env
+      MYSQL_DATABASE: pagos_db
+    ports: ["3316:3306"]
+    networks: [red_pagos]
+    volumes: [persistencia_db_pagos:/var/lib/mysql]
+
+  workspace-pagos:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_pagos
+    ports: ["9090:8090"] # Ajustado puerto host para evitar choques con Becas
+    depends_on: [db-pagos]
+    networks: [red_pagos, red_universidad]
+    command: tail -f /dev/null
+    volumes: ["./pagos:/app"]
+    working_dir: /app
+
 networks:
-  red_universidad: # Esta red une a todos los microservicios
+  red_universidad:
   red_asignaturas:
   red_becas:
   red_carrera:
-  red_interna_proyecto:
   red_profesores:
   red_salas:
   red_pagos:

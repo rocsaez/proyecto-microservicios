@@ -4,7 +4,7 @@ import cl.duoc.evaluacion.client.InscripcionClient;
 import cl.duoc.evaluacion.dto.EvaluacionDTO;
 import cl.duoc.evaluacion.dto.EvaluacionCreateDTO;
 import cl.duoc.evaluacion.model.EvaluacionModel;
-import cl.duoc.evaluacion.repository.EvaluacionInterface;
+import cl.duoc.evaluacion.repository.EvaluacionRepository;
 import cl.duoc.evaluacion.exceptions.RecursoNoEncontradoException;
 import cl.duoc.evaluacion.exceptions.ServicioNoDisponibleException;
 import feign.FeignException;
@@ -22,7 +22,7 @@ public class EvaluacionService {
     private static final Logger log = LoggerFactory.getLogger(EvaluacionService.class);
 
     @Autowired
-    private EvaluacionInterface repository;
+    private EvaluacionRepository repository;
 
     @Autowired
     private InscripcionClient inscripcionClient;
@@ -30,7 +30,7 @@ public class EvaluacionService {
     public EvaluacionDTO guardar(EvaluacionCreateDTO dto) {
         log.info("Registrando nueva evaluación para: {} en {}", dto.getNombreEstudiante(), dto.getAsignatura());
         
-        // Validación: El alumno debe estar inscrito para tener nota
+        // Validación obligatoria via Feign Client
         validarInscripcion(dto.getNombreEstudiante());
 
         EvaluacionModel model = new EvaluacionModel();
@@ -45,6 +45,7 @@ public class EvaluacionService {
     }
 
     public EvaluacionDTO actualizar(Long id, EvaluacionCreateDTO dto) {
+        log.info("Modificando evaluación ID: {}", id);
         EvaluacionModel model = repository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Evaluación no encontrada con ID: " + id));
         
@@ -63,37 +64,39 @@ public class EvaluacionService {
             var inscripciones = inscripcionClient.obtenerInscripcionesPorRut(nombre);
             
             if (inscripciones == null || inscripciones.isEmpty()) {
-                log.warn("El estudiante {} no registra inscripciones", nombre);
+                log.warn("El estudiante {} no registra inscripciones activas", nombre);
                 throw new RecursoNoEncontradoException("El estudiante " + nombre + " no registra inscripciones vigentes.");
             }
         } catch (FeignException.NotFound e) {
-            log.warn("No se encontró registro de inscripciones para: {}", nombre);
+            log.warn("No se encontró el recurso en el servicio externo para: {}", nombre);
             throw new RecursoNoEncontradoException("No se encontraron registros de inscripción.");
         } catch (FeignException e) {
-            log.error("Error de conexión con micro de Inscripciones: {}", e.getMessage());
-            throw new ServicioNoDisponibleException("Servicio de Inscripciones no disponible.");
+            log.error("Falla de comunicación por Feign: {}", e.getMessage());
+            throw new ServicioNoDisponibleException("Servicio remoto de Inscripciones no disponible.");
         }
     }
 
     public List<EvaluacionDTO> obtenerTodos() {
+        log.info("Consultando la totalidad de las evaluaciones");
         return repository.findAll().stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
     public EvaluacionDTO obtenerPorId(Long id) {
+        log.info("Buscando evaluación por ID: {}", id);
         return repository.findById(id)
                 .map(this::convertirADTO)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Evaluación no encontrada con ID: " + id));
     }
 
-    public boolean eliminar(Long id) {
-        if (repository.existsById(id)) {
-            repository.deleteById(id);
-            log.info("Evaluación ID {} eliminada", id);
-            return true;
+    public void eliminar(Long id) {
+        log.info("Solicitud para eliminar evaluación ID: {}", id);
+        if (!repository.existsById(id)) {
+            throw new RecursoNoEncontradoException("Evaluación no encontrada con ID: " + id);
         }
-        return false;
+        repository.deleteById(id);
+        log.info("Evaluación ID {} eliminada con éxito", id);
     }
 
     private EvaluacionDTO convertirADTO(EvaluacionModel model) {

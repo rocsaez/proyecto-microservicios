@@ -1,4 +1,3 @@
-
 services:
   # ------------------------------------------------------------------
   # CONTENEDOR 1: LA BASE DE DATOS MYSQL PARA EL SISTEMA DE BECAS
@@ -8,11 +7,11 @@ services:
     container_name: mysql_beca
     environment:
       MYSQL_ROOT_PASSWORD: clave_maestra_root
-      MYSQL_DATABASE: universidad_backend
+      MYSQL_DATABASE: becas_db  # <-- CORREGIDO: Base de datos única
       MYSQL_USER: desarrollador
       MYSQL_PASSWORD: password_seguro_123
     ports:
-      - "3311:3306"  # Usamos el puerto 3311 para que sea único
+      - "3311:3306"
     networks:
       - red_becas
     volumes:
@@ -25,7 +24,7 @@ services:
     image: maven:3.9-eclipse-temurin-21
     container_name: entorno_beca
     ports:
-      - "8086:8086" # El microservicio correrá en el puerto 8086
+      - "8086:8086"
     depends_on:
       - db-beca
     networks:

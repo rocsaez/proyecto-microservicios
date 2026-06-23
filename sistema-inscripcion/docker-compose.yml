@@ -1,11 +1,13 @@
-
 services:
+  # ------------------------------------------------------------------
+  # CONTENEDOR 1: LA BASE DE DATOS MYSQL PARA EL SISTEMA DE INSCRIPCIÓN
+  # ------------------------------------------------------------------
   db-inscripcion:
     image: mysql:8.0
     container_name: mysql_inscripcion
     environment:
       MYSQL_ROOT_PASSWORD: clave_maestra_root
-      MYSQL_DATABASE: universidad_backend
+      MYSQL_DATABASE: inscripciones_db
       MYSQL_USER: desarrollador
       MYSQL_PASSWORD: password_seguro_123
     ports:
@@ -15,21 +17,32 @@ services:
     volumes:
       - persistencia_db_inscripcion:/var/lib/mysql
 
+  # ------------------------------------------------------------------
+  # CONTENEDOR 2: EL ENTORNO DE TRABAJO JAVA/SPRING BOOT
+  # ------------------------------------------------------------------
   workspace-inscripcion:
     image: maven:3.9-eclipse-temurin-21
     container_name: entorno_inscripcion
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql_inscripcion:3306/inscripciones_db?createDatabaseIfNotExist=true
+      - ESTUDIANTES_URL=http://entorno_programacion1:8081
+      - ASIGNATURAS_URL=http://entorno_asignatura:8080
     ports:
       - "8085:8085"
     depends_on:
       - db-inscripcion
     networks:
       - red_inscripcion
+      - red_universidad
     command: tail -f /dev/null
     volumes:
-      - ./codigo-fuente:/app
+      - .:/app
+    working_dir: /app
 
 networks:
   red_inscripcion:
+    driver: bridge
+  red_universidad:
     driver: bridge
 
 volumes:

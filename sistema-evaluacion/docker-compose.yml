@@ -1,12 +1,13 @@
-
-
 services:
+  # ------------------------------------------------------------------
+  # CONTENEDOR 1: LA BASE DE DATOS MYSQL PARA EL SISTEMA DE EVALUACIÓN
+  # ------------------------------------------------------------------
   db-evaluacion:
     image: mysql:8.0
     container_name: mysql_evaluacion
     environment:
       MYSQL_ROOT_PASSWORD: clave_maestra_root
-      MYSQL_DATABASE: universidad_backend
+      MYSQL_DATABASE: evaluacion_db  # <-- CORREGIDO: Emparejado con el properties
       MYSQL_USER: desarrollador
       MYSQL_PASSWORD: password_seguro_123
     ports:
@@ -16,6 +17,9 @@ services:
     volumes:
       - persistencia_db_evaluacion:/var/lib/mysql
 
+  # ------------------------------------------------------------------
+  # CONTENEDOR 2: EL ENTORNO DE TRABAJO JAVA/SPRING BOOT
+  # ------------------------------------------------------------------
   workspace-evaluacion:
     image: maven:3.9-eclipse-temurin-21
     container_name: entorno_evaluacion
@@ -25,12 +29,15 @@ services:
       - db-evaluacion
     networks:
       - red_evaluacion
+      - red_universidad  # Agregada para comunicarse con Asignaturas vía Feign
     command: tail -f /dev/null
     volumes:
-      - ./codigo-fuente:/app
+      - ./sistema-evaluacion:/app # CORREGIDO: Carpeta del módulo mapeada correctamente
 
 networks:
   red_evaluacion:
+    driver: bridge
+  red_universidad:
     driver: bridge
 
 volumes:

@@ -1,10 +1,13 @@
 services:
+  # ------------------------------------------------------------------
+  # CONTENEDOR 1: LA BASE DE DATOS MYSQL PARA EL SISTEMA DE ASISTENCIA
+  # ------------------------------------------------------------------
   db-asistencia:
     image: mysql:8.0
     container_name: mysql_asistencia
     environment:
       MYSQL_ROOT_PASSWORD: clave_maestra_root
-      MYSQL_DATABASE: universidad_backend
+      MYSQL_DATABASE: asistencia_db  # <-- CORREGIDO: Base de datos única
       MYSQL_USER: desarrollador
       MYSQL_PASSWORD: password_seguro_123
     ports:
@@ -14,6 +17,9 @@ services:
     volumes:
       - persistencia_db_asistencia:/var/lib/mysql
 
+  # ------------------------------------------------------------------
+  # CONTENEDOR 2: EL ENTORNO DE TRABAJO JAVA/SPRING BOOT
+  # ------------------------------------------------------------------
   workspace-asistencia:
     image: maven:3.9-eclipse-temurin-21
     container_name: entorno_asistencia
@@ -23,13 +29,15 @@ services:
       - db-asistencia
     networks:
       - red_asistencia
+      - red_universidad  # Agregada para permitir que se comunique con Inscripciones y Salas vía Feign
     command: tail -f /dev/null
     volumes:
-      - ./src:/app/src
-      - ./pom.xml:/app/pom.xml
+      - ./sistema-asistencia:/app # CORREGIDO: Apunta a la carpeta del módulo de asistencia
 
 networks:
   red_asistencia:
+    driver: bridge
+  red_universidad:
     driver: bridge
 
 volumes:

@@ -20,4 +20,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(Map.of("error", e.getMessage()));
     }
+
+    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationErrors(
+            org.springframework.web.bind.MethodArgumentNotValidException e) {
+        
+        Map<String, String> errores = new java.util.HashMap<>();
+        e.getBindingResult().getFieldErrors().forEach(error -> 
+            errores.put(error.getField(), error.getDefaultMessage())
+        );
+        
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errores);
+    }
 }

@@ -7,6 +7,7 @@ import cl.duoc.gestion_sala.repository.SalaRepository;
 import cl.duoc.gestion_sala.exceptions.RecursoNoEncontradoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,65 +16,58 @@ import java.util.stream.Collectors;
 public class SalaService {
 
     private static final Logger log = LoggerFactory.getLogger(SalaService.class);
-    private final SalaRepository repository;
 
-    public SalaService(SalaRepository repository) {
-        this.repository = repository;
-    }
-
-    public SalaDTO guardar(SalaCreateDTO dto) {
-        log.info("Creando nueva sala: {}", dto.getNombreSala());
-        SalaModel sala = new SalaModel();
-        sala.setNombreSala(dto.getNombreSala());
-        sala.setCapacidad(dto.getCapacidad());
-        sala.setTipo(dto.getTipo());
-        sala.setUbicacion(dto.getUbicacion());
-
-        SalaModel guardado = repository.save(sala);
-        log.info("Sala guardada exitosamente con ID: {}", guardado.getId());
-        return convertirADTO(guardado);
-    }
+    @Autowired
+    private SalaRepository repository;
 
     public List<SalaDTO> obtenerTodas() {
-        log.info("Consultando todas las salas disponibles");
+        log.info("Consultando todas las salas");
         return repository.findAll().stream()
                 .map(this::convertirADTO)
                 .collect(Collectors.toList());
     }
 
     public SalaDTO obtenerPorId(Long id) {
-        return repository.findById(id)
-                .map(this::convertirADTO)
-                .orElseThrow(() -> {
-                    log.warn("Búsqueda fallida: Sala ID {} no existe", id);
-                    return new RecursoNoEncontradoException("Sala no encontrada con ID: " + id);
-                });
+        log.info("Buscando sala id={}", id);
+         SalaModel sala = repository.findById(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Sala no encontrada con ID: " + id));
+        log.info("Sala encontrada: nombre={}, capacidad={}", sala.getNombreSala(), sala.getCapacidad());
+        return convertirADTO(sala);
+    }
+
+    public SalaDTO guardar(SalaCreateDTO dto) {
+        log.info("Creando sala nombre={}", dto.getNombreSala());
+        SalaModel sala = new SalaModel();
+        sala.setNombreSala(dto.getNombreSala());
+        sala.setCapacidad(dto.getCapacidad());
+        sala.setTipo(dto.getTipo());
+        sala.setUbicacion(dto.getUbicacion());
+        
+        SalaModel guardado = repository.save(sala);
+        log.info("Sala creada id={}", guardado.getId());
+        return convertirADTO(guardado);
     }
 
     public SalaDTO actualizar(Long id, SalaCreateDTO dto) {
+        log.info("Actualizando sala id={}", id);
         SalaModel sala = repository.findById(id)
-                .orElseThrow(() -> {
-                    log.warn("Intento de actualización fallido: Sala ID {} no encontrada", id);
-                    return new RecursoNoEncontradoException("No se puede actualizar: Sala ID " + id + " no existe");
-                });
+                .orElseThrow(() -> new RecursoNoEncontradoException("Sala no encontrada con ID: " + id));
         
         sala.setNombreSala(dto.getNombreSala());
         sala.setCapacidad(dto.getCapacidad());
         sala.setTipo(dto.getTipo());
         sala.setUbicacion(dto.getUbicacion());
         
-        log.info("Sala ID {} actualizada correctamente", id);
         return convertirADTO(repository.save(sala));
     }
 
-    public boolean eliminar(Long id) {
-        if (repository.existsById(id)) {
-            repository.deleteById(id);
-            log.info("Sala ID {} eliminada", id);
-            return true;
+    public void eliminar(Long id) {
+        log.info("Eliminando sala id={}", id);
+        if (!repository.existsById(id)) {
+            throw new RecursoNoEncontradoException("Sala no encontrada con ID: " + id);
         }
-        log.warn("Intento de eliminación fallido: Sala ID {} no existe", id);
-        return false;
+        repository.deleteById(id);
+        log.info("Sala id={} eliminada", id);
     }
 
     private SalaDTO convertirADTO(SalaModel model) {

@@ -119,13 +119,13 @@ public class SistemaInscripcionesService {
         return convertirADTO(repository.save(ins));
     }
 
-    public boolean eliminar(Long id) {
-        if (repository.existsById(id)) {
-            repository.deleteById(id);
-            log.info("Inscripción ID {} eliminada.", id);
-            return true;
+  public void eliminar(Long id) {
+        log.info("Solicitud para eliminar inscripción ID: {}", id);
+        if (!repository.existsById(id)) {
+            throw new RecursoNoEncontradoException("Inscripción no encontrada con ID: " + id);
         }
-        return false;
+        repository.deleteById(id);
+        log.info("Inscripción ID {} eliminada con éxito", id);
     }
 
     private InscripcionDTO convertirADTO(SistemaInscripcionesModel model) {

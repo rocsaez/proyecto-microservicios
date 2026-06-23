@@ -7,6 +7,7 @@ import cl.duoc.sistema_biblioteca.repository.SistemaBibliotecaRepository;
 import cl.duoc.sistema_biblioteca.exceptions.RecursoNoEncontradoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,10 +16,25 @@ import java.util.stream.Collectors;
 public class SistemaBibliotecaService {
 
     private static final Logger log = LoggerFactory.getLogger(SistemaBibliotecaService.class);
-    private final SistemaBibliotecaRepository repository;
 
-    public SistemaBibliotecaService(SistemaBibliotecaRepository repository) {
-        this.repository = repository;
+    @Autowired
+    private SistemaBibliotecaRepository repository;
+
+    public List<BibliotecaDTO> obtenerTodos() {
+        log.info("Consultando catálogo completo de biblioteca");
+        return repository.findAll().stream()
+                .map(this::convertirADTO)
+                .collect(Collectors.toList());
+    }
+
+    public BibliotecaDTO obtenerPorId(Long id) {
+        log.info("Buscando libro id={}", id);
+        return repository.findById(id)
+                .map(this::convertirADTO)
+                .orElseThrow(() -> {
+                    log.warn("Búsqueda fallida: Libro con ID {} no encontrado", id);
+                    return new RecursoNoEncontradoException("Libro no encontrado con ID: " + id);
+                });
     }
 
     public BibliotecaDTO guardar(BibliotecaCreateDTO dto) {
@@ -33,23 +49,8 @@ public class SistemaBibliotecaService {
         return convertirADTO(guardado);
     }
 
-    public List<BibliotecaDTO> obtenerTodos() {
-        log.info("Consultando catálogo completo de biblioteca");
-        return repository.findAll().stream()
-                .map(this::convertirADTO)
-                .collect(Collectors.toList());
-    }
-
-    public BibliotecaDTO obtenerPorId(Long id) {
-        return repository.findById(id)
-                .map(this::convertirADTO)
-                .orElseThrow(() -> {
-                    log.warn("Búsqueda fallida: Libro con ID {} no encontrado", id);
-                    return new RecursoNoEncontradoException("Libro no encontrado con ID: " + id);
-                });
-    }
-
     public BibliotecaDTO actualizar(Long id, BibliotecaCreateDTO dto) {
+        log.info("Actualizando libro id={}", id);
         SistemaBibliotecaModel libro = repository.findById(id)
                 .orElseThrow(() -> {
                     log.warn("Intento de actualización fallido: Libro ID {} no existe", id);
@@ -60,18 +61,17 @@ public class SistemaBibliotecaService {
         libro.setAutor(dto.getAutor());
         libro.setIsbn(dto.getIsbn());
         
-        log.info("Libro ID {} actualizado correctamente", id);
         return convertirADTO(repository.save(libro));
     }
 
-    public boolean eliminar(Long id) {
-        if (repository.existsById(id)) {
-            repository.deleteById(id);
-            log.info("Libro ID {} eliminado del catálogo", id);
-            return true;
+    public void eliminar(Long id) {
+        log.info("Eliminando libro id={}", id);
+        if (!repository.existsById(id)) {
+            log.warn("Intento de eliminación fallido: Libro ID {} no existe", id);
+            throw new RecursoNoEncontradoException("Libro no encontrado con ID: " + id);
         }
-        log.warn("Intento de eliminación fallido: Libro ID {} no existe", id);
-        return false;
+        repository.deleteById(id);
+        log.info("Libro ID {} eliminado del catálogo", id);
     }
 
     private BibliotecaDTO convertirADTO(SistemaBibliotecaModel model) {

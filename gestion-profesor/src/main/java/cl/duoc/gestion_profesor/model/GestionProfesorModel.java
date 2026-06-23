@@ -1,13 +1,21 @@
 package cl.duoc.gestion_profesor.model;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Entity; 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
 
 @Data
-@Entity
+@Entity 
+@Table(name = "profesores")
 public class GestionProfesorModel {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String nombre;
     private String asignatura;
     private String correo;

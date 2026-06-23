@@ -11,7 +11,7 @@ services:
       MYSQL_USER: desarrollador
       MYSQL_PASSWORD: password_seguro_123
     ports:
-      - "3306:3306"
+      - "3311:3306"
     networks:
       - red_estudiantes # CORREGIDO: Red específica para aislar este módulo
     volumes:
@@ -23,6 +23,8 @@ services:
   workspace-java:
     image: maven:3.9-eclipse-temurin-21
     container_name: entorno_programacion1
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql_servidor:3306/estudiantes_db?createDatabaseIfNotExist=true
     ports:
       - "8081:8081"
     depends_on:
@@ -32,7 +34,7 @@ services:
       - red_universidad   # Red global para comunicarse con otros microservicios
     command: tail -f /dev/null
     volumes:
-      - ./gestion-estudiante:/app # CORREGIDO: Apunta a la carpeta correcta del proyecto
+      - .:/app # CORREGIDO: Apunta a la carpeta correcta del proyecto
     working_dir: /app
 
 networks:

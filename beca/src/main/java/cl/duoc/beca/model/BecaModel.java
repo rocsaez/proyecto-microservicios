@@ -5,11 +5,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "becas")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class BecaModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,5 +21,5 @@ public class BecaModel {
     private String nombreBeca;
     private Double porcentajeDescuento;
     private String rutEstudiante;
-    private String estado; // Ejemplo: "Asignada", "En Trámite"
+    private String estado; 
 }

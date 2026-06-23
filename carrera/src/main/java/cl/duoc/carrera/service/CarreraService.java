@@ -64,14 +64,13 @@ public class CarreraService {
         return convertirADTO(repository.save(carrera));
     }
 
-    public boolean eliminar(Long id) {
-        if (repository.existsById(id)) {
-            repository.deleteById(id);
-            log.info("Carrera ID {} eliminada", id);
-            return true;
+   public void eliminar(Long id) {
+        log.info("Eliminando carrera id={}", id);
+        if (!repository.existsById(id)) {
+            throw new RecursoNoEncontradoException("Carrera no encontrada con ID: " + id);
         }
-        log.warn("Intento de eliminación fallido: ID {} no existe", id);
-        return false;
+        repository.deleteById(id);
+        log.info("Carrera id={} eliminada", id);
     }
 
     private CarreraDTO convertirADTO(CarreraModel model) {
