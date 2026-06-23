@@ -99,7 +99,7 @@ Todos los módulos core completaron el ciclo de vida de pruebas con **0 errores*
 |  **Asignaturas** | **13** | 0 | 0 | 25.89 s | `BUILD SUCCESS` |
 |  **Sistema Inscripción** | **21** | 0 | 0 | 23.98 s | `BUILD SUCCESS`  |
 |  **Gestión Sala** | **17** | 0 | 0 | 27.14 s | `BUILD SUCCESS`  |
-|  **Gestión Profesor** | *Suite Core* | 0 | 0 | 15.21 s | `BUILD SUCCESS`  |
+|  **Gestión Profesor** | ** | 0 | 0 | 15.21 s | `BUILD SUCCESS`  |
 
 ---
 
