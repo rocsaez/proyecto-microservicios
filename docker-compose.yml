@@ -1,14 +1,16 @@
 version: '3.8'
+
 x-mysql-env: &mysql_env
   MYSQL_ROOT_PASSWORD: clave_maestra_root
   MYSQL_USER: desarrollador
   MYSQL_PASSWORD: password_seguro_123
+
 services:
   
   # --- MÓDULO ESTUDIANTES ---
   db-estudiantes:
     image: mysql:8.0
-    container_name: mysql_servidor
+    container_name: mysql_estudiantes  
     environment:
       <<: *mysql_env
       MYSQL_DATABASE: estudiantes_db
@@ -22,7 +24,7 @@ services:
     ports: ["8081:8081"]
     depends_on: [db-estudiantes]
     networks: [red_estudiantes, red_universidad]
-    command: tail -f /dev/null
+    command: mvn spring-boot:run
     volumes: ["./gestion-estudiante:/app"]
     working_dir: /app
 
@@ -43,7 +45,7 @@ services:
     ports: ["8082:8082"]
     depends_on: [db-profesor]
     networks: [red_profesores, red_universidad]
-    command: tail -f /dev/null
+    command: mvn spring-boot:run
     volumes: ["./gestion-profesor:/app"]
     working_dir: /app
 
@@ -64,7 +66,7 @@ services:
     ports: ["8083:8083"]
     depends_on: [db-biblioteca]
     networks: [red_biblioteca, red_universidad]
-    command: tail -f /dev/null
+    command: mvn spring-boot:run
     volumes: ["./sistema-biblioteca:/app"]
     working_dir: /app
 
@@ -85,7 +87,7 @@ services:
     ports: ["8084:8084"]
     depends_on: [db-evaluacion]
     networks: [red_evaluacion, red_universidad]
-    command: tail -f /dev/null
+    command: mvn spring-boot:run
     volumes: ["./sistema-evaluacion:/app"]
     working_dir: /app
 
@@ -106,7 +108,7 @@ services:
     ports: ["8085:8085"]
     depends_on: [db-inscripcion]
     networks: [red_inscripcion, red_universidad]
-    command: tail -f /dev/null
+    command: mvn spring-boot:run
     volumes: ["./sistema-inscripcion:/app"]
     working_dir: /app
 
@@ -127,7 +129,7 @@ services:
     ports: ["8086:8086"]
     depends_on: [db-beca]
     networks: [red_becas, red_universidad]
-    command: tail -f /dev/null
+    command: mvn spring-boot:run
     volumes: ["./becas:/app"]
     working_dir: /app
 
@@ -148,7 +150,7 @@ services:
     ports: ["8087:8087"]
     depends_on: [db-sala]
     networks: [red_salas, red_universidad]
-    command: tail -f /dev/null
+    command: mvn spring-boot:run
     volumes: ["./gestion-sala:/app"]
     working_dir: /app
 
@@ -169,7 +171,7 @@ services:
     ports: ["8088:8088"]
     depends_on: [db-asistencia]
     networks: [red_asistencia, red_universidad]
-    command: tail -f /dev/null
+    command: mvn spring-boot:run
     volumes: ["./sistema-asistencia:/app"]
     working_dir: /app
 
@@ -178,20 +180,29 @@ services:
     image: mysql:8.0
     container_name: mysql_asignaturas
     environment:
-      <<: *mysql_env
+      MYSQL_ROOT_PASSWORD: clave_maestra_root
       MYSQL_DATABASE: asignaturas_db
-    ports: ["3314:3306"]
-    networks: [red_asignaturas]
-    volumes: [persistencia_db_asignaturas:/var/lib/mysql]
+      MYSQL_USER: desarrollador
+      MYSQL_PASSWORD: password_seguro_123
+    ports:
+      - "3314:3306"
+    networks:
+      - red_universidad
+    volumes:
+      - persistencia_db_asignaturas:/var/lib/mysql
 
   workspace-asignaturas:
     image: maven:3.9-eclipse-temurin-21
     container_name: entorno_asignaturas
-    ports: ["8080:8080"]
-    depends_on: [db-asignaturas]
-    networks: [red_asignaturas, red_universidad]
-    command: tail -f /dev/null
-    volumes: ["./asignaturas:/app"]
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db-asignaturas
+    networks:
+      - red_universidad
+    command: bash -c "sleep 20; mvn spring-boot:run"
+    volumes:
+      - ./asignaturas:/app
     working_dir: /app
 
   # --- MÓDULO CARRERA ---
@@ -202,7 +213,7 @@ services:
       <<: *mysql_env
       MYSQL_DATABASE: carrera_db
     ports: ["3315:3306"]
-    networks: [red_carrera]
+    networks: [red_carrera, red_universidad]
     volumes: [persistencia_db_carrera:/var/lib/mysql]
 
   workspace-carrera:
@@ -211,7 +222,7 @@ services:
     ports: ["8089:8089"]
     depends_on: [db-carrera]
     networks: [red_carrera, red_universidad]
-    command: tail -f /dev/null
+    command: mvn spring-boot:run
     volumes: ["./carrera:/app"]
     working_dir: /app
 
@@ -229,11 +240,24 @@ services:
   workspace-pagos:
     image: maven:3.9-eclipse-temurin-21
     container_name: entorno_pagos
-    ports: ["9090:8090"] # Ajustado puerto host para evitar choques con Becas
+    ports: ["9090:8090"]
     depends_on: [db-pagos]
     networks: [red_pagos, red_universidad]
-    command: tail -f /dev/null
+    command: mvn spring-boot:run
     volumes: ["./pagos:/app"]
+    working_dir: /app
+
+  # --- API GATEWAY CENTRAL ---
+  workspace-gateway:
+    image: maven:3.9-eclipse-temurin-21
+    container_name: entorno_gateway
+    ports:
+      - "8090:8090"
+    networks:
+      - red_universidad
+    command: mvn spring-boot:run
+    volumes:
+      - ./ms-gateway:/app
     working_dir: /app
 
 networks:

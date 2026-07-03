@@ -1,0 +1,28 @@
+server:
+  port: 8090                   # Puerto público del Gateway en tu máquina de AWS
+
+spring:
+  application:
+    name: ms-gateway
+  cloud:
+    gateway:
+      routes:                  # Lista de reglas de enrutamiento
+        
+        # ── Ruta para ASIGNATURAS ─────────────────────────────────────
+        - id: asignaturas-route
+          uri: lb://ASIGNATURAS     # lb:// activa balanceo con el nombre en Eureka
+          predicates:
+            - Path=/api/asignaturas/** # Captura cualquier subpath
+
+        # ── Ruta para CARRERAS ───────────────────────────────────────
+        - id: carreras-route
+          uri: lb://CARRERA
+          predicates:
+            - Path=/api/carreras/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://3.86.130.217:8761/eureka/  # Tu Eureka remoto en AWS
+  instance:
+    prefer-ip-address: true  # Registra la IP interna de Docker en lugar del hostname

@@ -24,17 +24,14 @@ services:
   workspace-asignaturas:
     image: maven:3.9-eclipse-temurin-21
     container_name: entorno_asignaturas
-    ports:
-      - "8080:8080"
+    ports: ["8080:8080"]
     depends_on:
       - db-asignaturas
-    networks:
-      - red_asignaturas
-      - red_universidad
-    command: tail -f /dev/null
-    volumes:
-      - ./src:/app/src
-      - ./pom.xml:/app/pom.xml
+    networks: [red_asignaturas, red_universidad]
+    # 👇 CAMBIAMOS EL BUCLE POR UN SLEEP SEGURO:
+    command: bash -c "sleep 15; mvn spring-boot:run"
+    volumes: ["./asignaturas:/app"]
+    working_dir: /app
 
 networks:
   red_asignaturas:

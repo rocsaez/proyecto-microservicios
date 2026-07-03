@@ -96,7 +96,6 @@ class AsignaturaServiceTest {
         });
     }
 
-    // ── METODO ELIMINAR CORREGIDO (YA NO BUSCA UN BOOLEAN) ───────────────────
     @Test
     @DisplayName("eliminar - debe invocar deleteById exitosamente si la asignatura existe")
     void debeEliminarAsignaturaExistente() {

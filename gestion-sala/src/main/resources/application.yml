@@ -1,0 +1,50 @@
+server:
+  port: 8087
+
+spring:
+  application:
+    name: GESTION-SALA
+  
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://mysql_sala:3306/salas_db?createDatabaseIfNotExist=true}
+    username: ${SPRING_DATASOURCE_USERNAME:desarrollador}
+    password: ${SPRING_DATASOURCE_PASSWORD:password_seguro_123}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+  cloud:
+    compatibility-verifier:
+      enabled: false
+    openfeign:
+      client:
+        config:
+          default:
+            connectTimeout: 3000
+            readTimeout: 5000
+
+logging:
+  level:
+    cl:
+      duoc:
+        gestion_sala: INFO
+
+# OpenAPI / Swagger UI
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /doc/swagger-ui.html
+
+# ⚙️ Registro en tu Eureka de AWS
+eureka:
+  client:
+    service-url:
+      defaultZone: http://3.86.130.217:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    ip-address: 54.91.52.2

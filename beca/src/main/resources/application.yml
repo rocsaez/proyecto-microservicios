@@ -1,0 +1,49 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: BECA
+  
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://mysql_beca:3306/becas_db?createDatabaseIfNotExist=true}
+    username: ${SPRING_DATASOURCE_USERNAME:desarrollador}
+    password: ${SPRING_DATASOURCE_PASSWORD:password_seguro_123}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+  cloud:
+    compatibility-verifier:
+      enabled: false
+    openfeign:
+      client:
+        config:
+          default:
+            connectTimeout: 3000
+            readTimeout: 5000
+
+logging:
+  level:
+    cl:
+      duoc:
+        beca: INFO
+
+# Configuración Swagger / OpenAPI
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /doc/swagger-ui.html
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://3.86.130.217:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    ip-address: 54.91.52.2

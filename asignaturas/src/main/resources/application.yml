@@ -1,21 +1,27 @@
+server:
+  port: 8080
+
 spring:
   application:
-    name: asignaturas
+    name: ASIGNATURAS 
   
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://mysql_asignaturas:3306/asignaturas_db?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false}
-    username: ${SPRING_DATASOURCE_USERNAME:desarrollador}
-    password: ${SPRING_DATASOURCE_PASSWORD:password_seguro_123}
+    url: jdbc:mysql://mysql_asignaturas:3306/asignaturas_db?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
+    username: desarrollador
+    password: password_seguro_123
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+    
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
 
   cloud:
-    compatibility-verifier:
-      enabled: false
+    compatibility-verifier: { enabled: false }
     openfeign:
       client:
         config:
@@ -23,9 +29,15 @@ spring:
             connectTimeout: 3000
             readTimeout: 5000
 
-server:
-  port: 8080
 
+profesores:
+  service:
+    url: http://entorno_profesor:8082
+carrera:
+  service:
+    url: http://entorno_carrera:8089
+
+# Habilitar SpringDoc y Swagger UI
 springdoc:
   api-docs:
     enabled: true
@@ -33,10 +45,9 @@ springdoc:
     enabled: true
     path: /doc/swagger-ui.html
 
-# URLs de Microservicios externos
-profesores:
-  service:
-    url: ${PROFESORES_SERVICE_URL:http://entorno_profesor:8082}
-carrera:
-  service:
-    url: ${CARRERA_SERVICE_URL:http://entorno_carrera:8089}
+eureka:
+  client:
+    service-url:
+      defaultZone: http://3.86.130.217:8761/eureka/  # Tu IP de Eureka remota
+  instance:
+    prefer-ip-address: true  

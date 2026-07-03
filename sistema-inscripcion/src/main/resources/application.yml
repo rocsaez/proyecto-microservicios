@@ -1,0 +1,52 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: SISTEMA-INSCRIPCION
+  
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://mysql_inscripcion:3306/inscripciones_db?createDatabaseIfNotExist=true}
+    username: ${SPRING_DATASOURCE_USERNAME:desarrollador}
+    password: ${SPRING_DATASOURCE_PASSWORD:password_seguro_123}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  cloud:
+    compatibility-verifier:
+      enabled: false
+    openfeign:
+      client:
+        config:
+          default:
+            connectTimeout: 3000
+            readTimeout: 5000
+
+# Clientes Feign Dinámicos
+estudiantes:
+  service:
+    url: ${ESTUDIANTES_URL:http://127.0.0.1:8081}
+asignaturas:
+  service:
+    url: ${ASIGNATURAS_URL:http://127.0.0.1:8080}
+
+# Configuración Swagger / OpenAPI
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /doc/swagger-ui.html
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://3.86.130.217:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    ip-address: 54.91.52.2
