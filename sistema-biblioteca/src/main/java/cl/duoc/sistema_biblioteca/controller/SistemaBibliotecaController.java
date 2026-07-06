@@ -18,6 +18,7 @@ import java.util.List;
 @Tag(name = "Biblioteca", description = "Operaciones CRUD del catálogo de libros")
 @RestController
 @RequestMapping("/api/biblioteca")
+@CrossOrigin(origins = "*")
 public class SistemaBibliotecaController {
 
     @Autowired

@@ -1,28 +1,116 @@
 server:
-  port: 8090                   # Puerto público del Gateway en tu máquina de AWS
+  port: 8099                   # Puerto público asignado al API Gateway
 
 spring:
   application:
     name: ms-gateway
   cloud:
+    compatibility-verifier:
+      enabled: false
     gateway:
-      routes:                  # Lista de reglas de enrutamiento
-        
-        # ── Ruta para ASIGNATURAS ─────────────────────────────────────
+      routes:
+        # 1. ASIGNATURAS
         - id: asignaturas-route
-          uri: lb://ASIGNATURAS     # lb:// activa balanceo con el nombre en Eureka
+          uri: lb://MS-ASIGNATURAS
           predicates:
-            - Path=/api/asignaturas/** # Captura cualquier subpath
+            - Path=/api/asignaturas/**, /v3/api-docs/MS-ASIGNATURAS/**
 
-        # ── Ruta para CARRERAS ───────────────────────────────────────
-        - id: carreras-route
-          uri: lb://CARRERA
+        # 2. BECA
+        - id: beca-route
+          uri: lb://MS-BECAS
           predicates:
-            - Path=/api/carreras/**
+            - Path=/api/becas/**, /v3/api-docs/MS-BECAS/**
 
+        # 3. CARRERA
+        - id: carrera-route
+          uri: lb://MS-CARRERAS
+          predicates:
+            - Path=/api/carreras/**, /v3/api-docs/MS-CARRERAS/**
+
+        # 4. EVALUACION
+        - id: evaluacion-route
+          uri: lb://MS-EVALUACIONES
+          predicates:
+            - Path=/api/evaluaciones/**, /v3/api-docs/MS-EVALUACIONES/**
+
+        # 5. GESTION-ESTUDIANTE
+        - id: estudiante-route
+          uri: lb://MS-ESTUDIANTES
+          predicates:
+            - Path=/api/estudiantes/**, /v3/api-docs/MS-ESTUDIANTES/**
+
+        # 6. GESTION-PROFESOR
+        - id: profesor-route
+          uri: lb://MS-PROFESORES
+          predicates:
+            - Path=/api/profesores/**, /v3/api-docs/MS-PROFESORES/**
+
+        # 7. GESTION-SALA
+        - id: sala-route
+          uri: lb://MS-SALAS
+          predicates:
+            - Path=/api/salas/**, /v3/api-docs/MS-SALAS/**
+
+        # 8. PAGOS
+        - id: pagos-route
+          uri: lb://MS-PAGOS
+          predicates:
+            - Path=/api/pagos/**, /v3/api-docs/MS-PAGOS/**
+
+        # 9. SISTEMA-ASISTENCIA
+        - id: asistencia-route
+          uri: lb://MS-ASISTENCIAS
+          predicates:
+            - Path=/api/asistencias/**, /v3/api-docs/MS-ASISTENCIAS/**
+
+        # 10. SISTEMA-BIBLIOTECA
+        - id: biblioteca-route
+          uri: lb://MS-BIBLIOTECA
+          predicates:
+            - Path=/api/biblioteca/**, /v3/api-docs/MS-BIBLIOTECA/**
+
+        # 11. SISTEMA-INSCRIPCION
+        - id: inscripcion-route
+          uri: lb://MS-INSCRIPCIONES
+          predicates:
+            - Path=/api/inscripciones/**, /v3/api-docs/MS-INSCRIPCIONES/**
+
+# Registro en el Eureka de AWS
 eureka:
   client:
     service-url:
-      defaultZone: http://3.86.130.217:8761/eureka/  # Tu Eureka remoto en AWS
+      defaultZone: http://3.86.130.217:8761/eureka/
   instance:
-    prefer-ip-address: true  # Registra la IP interna de Docker en lugar del hostname
+    prefer-ip-address: true
+    ip-address: 54.91.52.2
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG  # Muestra en los logs cómo redirige cada URL
+
+# Configuración unificada de Swagger UI en el Gateway
+springdoc:
+  swagger-ui:
+    urls:
+      - name: 1. Asignaturas
+        url: /v3/api-docs/MS-ASIGNATURAS
+      - name: 2. Becas
+        url: /v3/api-docs/MS-BECAS
+      - name: 3. Carreras
+        url: /v3/api-docs/MS-CARRERAS
+      - name: 4. Evaluaciones
+        url: /v3/api-docs/MS-EVALUACIONES
+      - name: 5. Estudiantes
+        url: /v3/api-docs/MS-ESTUDIANTES
+      - name: 6. Profesores
+        url: /v3/api-docs/MS-PROFESORES
+      - name: 7. Salas
+        url: /v3/api-docs/MS-SALAS
+      - name: 8. Pagos
+        url: /v3/api-docs/MS-PAGOS
+      - name: 9. Asistencias
+        url: /v3/api-docs/MS-ASISTENCIAS
+      - name: 10. Biblioteca
+        url: /v3/api-docs/MS-BIBLIOTECA
+      - name: 11. Inscripciones
+        url: /v3/api-docs/MS-INSCRIPCIONES

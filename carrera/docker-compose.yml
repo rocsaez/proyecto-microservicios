@@ -1,25 +1,20 @@
 services:
-  # ------------------------------------------------------------------
-  # CONTENEDOR 1: LA BASE DE DATOS MYSQL PARA EL SISTEMA DE CARRERA
-  # ------------------------------------------------------------------
   db-carrera:
     image: mysql:8.0
     container_name: mysql_carrera
     environment:
       MYSQL_ROOT_PASSWORD: clave_maestra_root
-      MYSQL_DATABASE: carrera_db  # <-- BD independiente cumplida
+      MYSQL_DATABASE: carrera_db
       MYSQL_USER: desarrollador
       MYSQL_PASSWORD: password_seguro_123
     ports:
-      - "3315:3306"
+      - "3315:3306"  
     networks:
       - red_carrera
+      - red_universidad
     volumes:
       - persistencia_db_carrera:/var/lib/mysql
 
-  # ------------------------------------------------------------------
-  # CONTENEDOR 2: EL ENTORNO DE TRABAJO JAVA/SPRING BOOT
-  # ------------------------------------------------------------------
   workspace-carrera:
     image: maven:3.9-eclipse-temurin-21
     container_name: entorno_carrera
@@ -29,17 +24,18 @@ services:
       - db-carrera
     networks:
       - red_carrera
-      - red_universidad  # <-- IMPORTANTE: Permite recibir llamadas Feign de Asignaturas
-    command: tail -f /dev/null
+      - red_universidad
+    command: bash -c "sleep 15; mvn spring-boot:run -Dmaven.test.skip=true -DskipTests"
     volumes:
-      - .:/app           # <-- CORREGIDO: Mapea la carpeta completa
-    working_dir: /app    # <-- CORREGIDO: Inicia directo en la raíz de la app
+      - ./:/app
+    working_dir: /app
 
 networks:
   red_carrera:
     driver: bridge
   red_universidad:
-    driver: bridge
+    external: true
+    name: proyecto_red_universidad 
 
 volumes:
   persistencia_db_carrera:

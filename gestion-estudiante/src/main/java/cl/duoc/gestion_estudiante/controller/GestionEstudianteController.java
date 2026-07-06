@@ -20,6 +20,7 @@ import java.util.List;
 @Tag(name = "Estudiantes", description = "Operaciones para la gestión, registro y búsqueda de alumnos")
 @RestController
 @RequestMapping("/api/estudiantes")
+@CrossOrigin(origins = "*")
 public class GestionEstudianteController {
 
     private final GestionEstudianteService service;

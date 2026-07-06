@@ -3,19 +3,21 @@ server:
 
 spring:
   application:
-    name: CARRERA
+    name: MS-CARRERAS  # 👈 Cambiado a plural para hacer match con el Gateway
   
   datasource:
-    # 🔄 Cambiado localhost por mysql_carrera
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://mysql_carrera:3306/carrera_db?createDatabaseIfNotExist=true}
-    username: ${SPRING_DATASOURCE_USERNAME:desarrollador}
-    password: ${SPRING_DATASOURCE_PASSWORD:password_seguro_123}
+    url: jdbc:mysql://mysql_carrera:3306/carrera_db?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
+    username: desarrollador
+    password: password_seguro_123
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
 
   cloud:
     compatibility-verifier:
@@ -27,19 +29,19 @@ spring:
             connectTimeout: 3000
             readTimeout: 5000
 
-# Configuración Swagger / OpenAPI
+# 🛠️ Configuración unificada para el Swagger del Gateway
 springdoc:
   api-docs:
     enabled: true
+    path: /v3/api-docs/MS-CARRERAS  # 👈 AGREGADO: Crucial para el menú desplegable
   swagger-ui:
     enabled: true
     path: /doc/swagger-ui.html
 
-# ⚙️ Registro en tu Eureka de AWS
 eureka:
   client:
     service-url:
       defaultZone: http://3.86.130.217:8761/eureka/
   instance:
     prefer-ip-address: true
-    ip-address: 54.91.52.2
+    ip-address: 54.91.52.2 

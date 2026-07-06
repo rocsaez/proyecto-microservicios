@@ -15,9 +15,13 @@ spring:
     compatibility-verifier:
       enabled: false
 
-# Desactivar Swagger en entorno de pruebas
 springdoc:
   api-docs:
     enabled: false
   swagger-ui:
+    enabled: false
+
+
+eureka:
+  client:
     enabled: false

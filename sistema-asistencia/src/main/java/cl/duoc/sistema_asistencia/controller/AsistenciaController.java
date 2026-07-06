@@ -18,6 +18,7 @@ import java.util.List;
 @Tag(name = "Asistencias", description = "Operaciones CRUD del registro de asistencias")
 @RestController
 @RequestMapping("/api/asistencias")
+@CrossOrigin(origins = "*")
 public class AsistenciaController {
 
     @Autowired

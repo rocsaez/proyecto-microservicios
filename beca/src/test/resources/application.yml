@@ -15,14 +15,16 @@ spring:
     compatibility-verifier:
       enabled: false
 
-# Propiedad para la URL de Feign ficticia durante pruebas
 app:
   estudiante-service:
     url: http://localhost:8081
 
-# Desactivar Swagger en tests
 springdoc:
   api-docs:
     enabled: false
   swagger-ui:
+    enabled: false
+
+eureka:
+  client:
     enabled: false

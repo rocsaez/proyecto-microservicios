@@ -3,10 +3,10 @@ server:
 
 spring:
   application:
-    name: EVALUACION
+    name: MS-EVALUACIONES  
   
   datasource:
-    url: jdbc:mysql://mysql_evaluacion:3306/evaluacion_db?createDatabaseIfNotExist=true
+    url: jdbc:mysql://mysql_evaluacion:3306/evaluacion_db?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
     username: desarrollador
     password: password_seguro_123
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -15,8 +15,16 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
 
   cloud:
+    compatibility-verifier:
+      enabled: false
+    inetutils:
+      preferred-networks:
+        - 172.
     openfeign:
       client:
         config:
@@ -26,23 +34,19 @@ spring:
 
 logging:
   level:
-    cl:
-      duoc:
-        evaluacion: INFO
+    cl.duoc.evaluacion: INFO
 
-# Conexiones Feign Clientes
 asignaturas:
   service:
     url: http://entorno_asignaturas:8080
 
-# Swagger UI / OpenAPI al estilo del profesor
 springdoc:
   api-docs:
     enabled: true
+    path: /v3/api-docs/MS-EVALUACIONES  
   swagger-ui:
     enabled: true
     path: /doc/swagger-ui.html
-
 
 eureka:
   client:
@@ -50,4 +54,4 @@ eureka:
       defaultZone: http://3.86.130.217:8761/eureka/
   instance:
     prefer-ip-address: true
-    ip-address: 54.91.52.2
+    ip-address: 54.91.52.2  

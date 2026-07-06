@@ -18,6 +18,7 @@ import java.util.List;
 @Tag(name = "Evaluaciones", description = "Operaciones CRUD para la gestión de calificaciones académicas")
 @RestController
 @RequestMapping("/api/evaluaciones")
+@CrossOrigin(origins = "*")
 public class EvaluacionController {
 
     @Autowired

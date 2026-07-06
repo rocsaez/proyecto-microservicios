@@ -1,47 +1,41 @@
 services:
-  # -----------------------------------------------------------
-  # CONTENEDOR 1: LA BASE DE DATOS MYSQL
-  # -----------------------------------------------------------
-  db-estudiantes:
+  db-estudiante:
     image: mysql:8.0
-    container_name: mysql_servidor
+    container_name: mysql_estudiante
     environment:
       MYSQL_ROOT_PASSWORD: clave_maestra_root
       MYSQL_DATABASE: estudiantes_db
       MYSQL_USER: desarrollador
       MYSQL_PASSWORD: password_seguro_123
     ports:
-      - "3311:3306"
+      - "3311:3306"  # Puerto expuesto para evitar colisiones
     networks:
-      - red_estudiantes # CORREGIDO: Red específica para aislar este módulo
+      - red_estudiante
+      - red_universidad
     volumes:
-      - persistencia_db_estudiantes:/var/lib/mysql # Sincronizado con el global
+      - persistencia_db_estudiante:/var/lib/mysql
 
-  # -----------------------------------------------------------
-  # CONTENEDOR 2: EL ENTORNO DE TRABAJO JAVA/SPRING BOOT
-  # -----------------------------------------------------------
-  workspace-java:
+  workspace-estudiante:
     image: maven:3.9-eclipse-temurin-21
-    container_name: entorno_programacion1
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql_servidor:3306/estudiantes_db?createDatabaseIfNotExist=true
+    container_name: entorno_estudiante
     ports:
       - "8081:8081"
     depends_on:
-      - db-estudiantes
+      - db-estudiante
     networks:
-      - red_estudiantes   # Red privada con su base de datos
-      - red_universidad   # Red global para comunicarse con otros microservicios
-    command: tail -f /dev/null
+      - red_estudiante
+      - red_universidad
+    command: bash -c "sleep 15; mvn spring-boot:run -Dmaven.test.skip=true -DskipTests"
     volumes:
-      - .:/app # CORREGIDO: Apunta a la carpeta correcta del proyecto
+      - ./:/app
     working_dir: /app
 
 networks:
-  red_estudiantes:
+  red_estudiante:
     driver: bridge
   red_universidad:
-    driver: bridge
+    external: true
+    name: proyecto_red_universidad  # Conectado a la red global de tus otros servicios
 
 volumes:
-  persistencia_db_estudiantes:
+  persistencia_db_estudiante:

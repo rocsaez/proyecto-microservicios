@@ -23,9 +23,12 @@ estudiantes:
   service:
     url: http://localhost:8081
 
-# Desactivar interfaces gráficas y generación de Swagger en tests
 springdoc:
   api-docs:
     enabled: false
   swagger-ui:
+    enabled: false
+
+eureka:
+  client:
     enabled: false

@@ -1,25 +1,20 @@
 services:
-  # ------------------------------------------------------------------
-  # CONTENEDOR 1: LA BASE DE DATOS MYSQL PARA GESTIÓN DE SALAS
-  # ------------------------------------------------------------------
   db-sala:
     image: mysql:8.0
     container_name: mysql_sala
     environment:
       MYSQL_ROOT_PASSWORD: clave_maestra_root
-      MYSQL_DATABASE: salas_db  # <-- CORREGIDO: Base de datos única
+      MYSQL_DATABASE: salas_db
       MYSQL_USER: desarrollador
       MYSQL_PASSWORD: password_seguro_123
     ports:
-      - "3312:3306"
+      - "3313:3306"
     networks:
       - red_salas
+      - red_universidad
     volumes:
       - persistencia_db_sala:/var/lib/mysql
 
-  # ------------------------------------------------------------------
-  # CONTENEDOR 2: ENTORNO JAVA
-  # ------------------------------------------------------------------
   workspace-sala:
     image: maven:3.9-eclipse-temurin-21
     container_name: entorno_sala
@@ -30,16 +25,17 @@ services:
     networks:
       - red_salas
       - red_universidad 
-    command: tail -f /dev/null
+    command: bash -c "sleep 15; mvn spring-boot:run -Dmaven.test.skip=true -DskipTests"
     volumes:
-
-      - .:/app
+      - ./:/app
+    working_dir: /app
 
 networks:
   red_salas:
     driver: bridge
   red_universidad:
-    driver: bridge
+    external: true
+    name: proyecto_red_universidad 
 
 volumes:
   persistencia_db_sala:

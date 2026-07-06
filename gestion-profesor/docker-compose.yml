@@ -1,26 +1,21 @@
 services:
-  # ------------------------------------------------------------------
-  # CONTENEDOR 1: LA BASE DE DATOS MYSQL PARA PROFESORES
-  # ------------------------------------------------------------------
-  db-profesor: # Nombre simplificado para hacer match con el global
+  db-profesor:
     image: mysql:8.0
     container_name: mysql_profesor
     environment:
       MYSQL_ROOT_PASSWORD: clave_maestra_root
-      MYSQL_DATABASE: profesores_db  # <-- CORREGIDO: Base de datos única
+      MYSQL_DATABASE: profesores_db
       MYSQL_USER: desarrollador
       MYSQL_PASSWORD: password_seguro_123
     ports:
-      - "3307:3306"
+      - "3307:3306" 
     networks:
       - red_profesores
+      - red_universidad
     volumes:
       - persistencia_db_profesor:/var/lib/mysql
 
-  # ------------------------------------------------------------------
-  # CONTENEDOR 2: EL ENTORNO DE TRABAJO JAVA/SPRING BOOT
-  # ------------------------------------------------------------------
-  workspace-profesor: # Nombre unificado
+  workspace-profesor:
     image: maven:3.9-eclipse-temurin-21
     container_name: entorno_profesor
     ports:
@@ -29,17 +24,18 @@ services:
       - db-profesor
     networks:
       - red_profesores
-      - red_universidad # Agregada para permitir conexiones Feign entrantes/salientes
-    command: tail -f /dev/null
+      - red_universidad
+    command: bash -c "sleep 15; mvn spring-boot:run -Dmaven.test.skip=true -DskipTests"
     volumes:
-      - .:/app            # <-- CORREGIDO: Usa el punto (.) porque ya estás dentro de la carpeta
+      - ./:/app
     working_dir: /app
   
 networks:
   red_profesores:
-    driver: bridge
+    driver: bridge  
   red_universidad:
-    driver: bridge
+    external: true
+    name: proyecto_red_universidad  
 
 volumes:
   persistencia_db_profesor:

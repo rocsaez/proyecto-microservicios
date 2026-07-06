@@ -3,22 +3,28 @@ server:
 
 spring:
   application:
-    name: SISTEMA-INSCRIPCION
+    name: MS-INSCRIPCIONES  # 👈 Cambiado a plural para el estándar del Gateway
   
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://mysql_inscripcion:3306/inscripciones_db?createDatabaseIfNotExist=true}
-    username: ${SPRING_DATASOURCE_USERNAME:desarrollador}
-    password: ${SPRING_DATASOURCE_PASSWORD:password_seguro_123}
+    url: jdbc:mysql://mysql_inscripcion:3306/inscripciones_db?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
+    username: desarrollador
+    password: password_seguro_123
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
 
   cloud:
     compatibility-verifier:
       enabled: false
+    inetutils:
+      preferred-networks:
+        - 172.
     openfeign:
       client:
         config:
@@ -26,22 +32,22 @@ spring:
             connectTimeout: 3000
             readTimeout: 5000
 
-# Clientes Feign Dinámicos
+# 🔌 Comunicación interna Docker ajustada a los nombres unificados
 estudiantes:
   service:
-    url: ${ESTUDIANTES_URL:http://127.0.0.1:8081}
+    url: ${ESTUDIANTES_URL:http://entorno_estudiante:8081}
 asignaturas:
   service:
-    url: ${ASIGNATURAS_URL:http://127.0.0.1:8080}
+    url: ${ASIGNATURAS_URL:http://entorno_asignaturas:8080}
 
-# Configuración Swagger / OpenAPI
+# 🛠️ Configuración unificada para el Swagger del Gateway
 springdoc:
   api-docs:
     enabled: true
+    path: /v3/api-docs/MS-INSCRIPCIONES  # 👈 AGREGADO: Para mapear el Swagger unificado
   swagger-ui:
     enabled: true
     path: /doc/swagger-ui.html
-
 
 eureka:
   client:
@@ -49,4 +55,4 @@ eureka:
       defaultZone: http://3.86.130.217:8761/eureka/
   instance:
     prefer-ip-address: true
-    ip-address: 54.91.52.2
+    ip-address: 54.91.52.2  # 👈 Forzamos tu IP de producción en AWS

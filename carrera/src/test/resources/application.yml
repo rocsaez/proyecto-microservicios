@@ -11,9 +11,12 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     show-sql: false
 
-# Desactivar Swagger en tests
 springdoc:
   api-docs:
     enabled: false
   swagger-ui:
+    enabled: false
+
+eureka:
+  client:
     enabled: false

@@ -19,6 +19,7 @@ import java.util.List;
 @Tag(name = "Salas", description = "Operaciones CRUD para la gestión de salas")
 @RestController
 @RequestMapping("/api/salas")
+@CrossOrigin(origins = "*")
 public class SalaController {
 
     @Autowired

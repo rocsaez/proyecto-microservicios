@@ -15,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/asignaturas")
+@CrossOrigin(origins = "*")
 @Tag(name = "Asignaturas", description = "Operaciones CRUD y de control para la gestión de asignaturas")
 public class AsignaturaController {
 

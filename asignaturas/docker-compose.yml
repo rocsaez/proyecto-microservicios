@@ -1,43 +1,40 @@
+version: '3.8'
+
 services:
-  # ------------------------------------------------------------------
-  # CONTENEDOR 1: LA BASE DE DATOS MYSQL PARA EL SISTEMA DE ASIGNATURAS
-  # ------------------------------------------------------------------
   db-asignaturas:
     image: mysql:8.0
     container_name: mysql_asignaturas
     environment:
       MYSQL_ROOT_PASSWORD: clave_maestra_root
-      MYSQL_DATABASE: asignaturas_db  # <-- CORREGIDO: Base de datos única
+      MYSQL_DATABASE: asignaturas_db
       MYSQL_USER: desarrollador
       MYSQL_PASSWORD: password_seguro_123
     ports:
       - "3314:3306"
     networks:
-      - red_asignaturas
       - red_universidad
     volumes:
       - persistencia_db_asignaturas:/var/lib/mysql
 
-  # ------------------------------------------------------------------
-  # CONTENEDOR 2: EL ENTORNO DE TRABAJO JAVA/SPRING BOOT
-  # ------------------------------------------------------------------
   workspace-asignaturas:
     image: maven:3.9-eclipse-temurin-21
     container_name: entorno_asignaturas
-    ports: ["8080:8080"]
+    ports:
+      - "8080:8080"
     depends_on:
       - db-asignaturas
-    networks: [red_asignaturas, red_universidad]
-    # 👇 CAMBIAMOS EL BUCLE POR UN SLEEP SEGURO:
-    command: bash -c "sleep 15; mvn spring-boot:run"
-    volumes: ["./asignaturas:/app"]
+    networks:
+      - red_universidad
+    command: bash -c "sleep 15; mvn spring-boot:run -Dmaven.test.skip=true -DskipTests"
+    volumes:
+      - ./:/app
     working_dir: /app
 
 networks:
-  red_asignaturas:
-    driver: bridge
   red_universidad:
-    driver: bridge
+    external: true
+    name: proyecto_red_universidad
+    
 
 volumes:
   persistencia_db_asignaturas:

@@ -1,44 +1,22 @@
-services:
-  # ------------------------------------------------------------------
-  # CONTENEDOR 1: LA BASE DE DATOS MYSQL PARA EL SISTEMA DE EVALUACIÓN
-  # ------------------------------------------------------------------
-  db-evaluacion:
-    image: mysql:8.0
-    container_name: mysql_evaluacion
-    environment:
-      MYSQL_ROOT_PASSWORD: clave_maestra_root
-      MYSQL_DATABASE: evaluacion_db  # <-- CORREGIDO: Emparejado con el properties
-      MYSQL_USER: desarrollador
-      MYSQL_PASSWORD: password_seguro_123
-    ports:
-      - "3309:3306"
-    networks:
-      - red_evaluacion
-    volumes:
-      - persistencia_db_evaluacion:/var/lib/mysql
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: false
 
-  # ------------------------------------------------------------------
-  # CONTENEDOR 2: EL ENTORNO DE TRABAJO JAVA/SPRING BOOT
-  # ------------------------------------------------------------------
-  workspace-evaluacion:
-    image: maven:3.9-eclipse-temurin-21
-    container_name: entorno_evaluacion
-    ports:
-      - "8084:8084"
-    depends_on:
-      - db-evaluacion
-    networks:
-      - red_evaluacion
-      - red_universidad  # Agregada para comunicarse con Asignaturas vía Feign
-    command: tail -f /dev/null
-    volumes:
-      - ./sistema-evaluacion:/app # CORREGIDO: Carpeta del módulo mapeada correctamente
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
 
-networks:
-  red_evaluacion:
-    driver: bridge
-  red_universidad:
-    driver: bridge
-
-volumes:
-  persistencia_db_evaluacion:
+eureka:
+  client:
+    enabled: false

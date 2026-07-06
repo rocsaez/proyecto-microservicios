@@ -3,22 +3,28 @@ server:
 
 spring:
   application:
-    name: SISTEMA-ASISTENCIA
+    name: MS-ASISTENCIAS  
   
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://mysql_asistencia:3306/asistencia_db?createDatabaseIfNotExist=true}
-    username: ${SPRING_DATASOURCE_USERNAME:desarrollador}
-    password: ${SPRING_DATASOURCE_PASSWORD:password_seguro_123}
+    url: jdbc:mysql://mysql_asistencia:3306/asistencia_db?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
+    username: desarrollador
+    password: password_seguro_123
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
 
   cloud:
     compatibility-verifier:
       enabled: false
+    inetutils:
+      preferred-networks:
+        - 172.
     openfeign:
       client:
         config:
@@ -28,11 +34,9 @@ spring:
 
 logging:
   level:
-    cl:
-      duoc:
-        sistema_asistencia: INFO
+    cl.duoc.sistema_asistencia: INFO
 
-# Conexiones Feign Clientes existentes
+
 inscripciones:
   service:
     url: http://entorno_inscripcion:8085
@@ -41,21 +45,21 @@ salas:
     url: http://entorno_sala:8087
 estudiantes:
   service:
-    url: http://32.198.93.76:8081
+    url: http://entorno_estudiante:8081 
 
-# Configuración Swagger / OpenAPI
+
 springdoc:
   api-docs:
     enabled: true
+    path: /v3/api-docs/MS-ASISTENCIAS  
   swagger-ui:
     enabled: true
     path: /doc/swagger-ui.html
 
-# ⚙️ Registro en tu Eureka de AWS
 eureka:
   client:
     service-url:
       defaultZone: http://3.86.130.217:8761/eureka/
   instance:
     prefer-ip-address: true
-    ip-address: 54.91.52.2
+    ip-address: 54.91.52.2  

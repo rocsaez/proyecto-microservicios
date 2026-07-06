@@ -1,25 +1,20 @@
 services:
-  # ------------------------------------------------------------------
-  # CONTENEDOR 1: LA BASE DE DATOS MYSQL PARA EL SISTEMA DE PAGOS
-  # ------------------------------------------------------------------
   db-pagos:
     image: mysql:8.0
     container_name: mysql_pagos
     environment:
       MYSQL_ROOT_PASSWORD: clave_maestra_root
-      MYSQL_DATABASE: pagos_db  # <-- CORREGIDO: Base de datos única
+      MYSQL_DATABASE: pagos_db
       MYSQL_USER: desarrollador
       MYSQL_PASSWORD: password_seguro_123
     ports:
       - "3316:3306"
     networks:
       - red_pagos
+      - red_universidad
     volumes:
       - persistencia_db_pagos:/var/lib/mysql
 
-  # ------------------------------------------------------------------
-  # CONTENEDOR 2: EL ENTORNO DE TRABAJO JAVA/SPRING BOOT
-  # ------------------------------------------------------------------
   workspace-pagos:
     image: maven:3.9-eclipse-temurin-21
     container_name: entorno_pagos
@@ -29,16 +24,18 @@ services:
       - db-pagos
     networks:
       - red_pagos
-      - red_universidad  # Agregada para permitir que se conecte con Estudiantes y Becas vía Feign
-    command: tail -f /dev/null
+      - red_universidad
+    command: bash -c "sleep 15; mvn spring-boot:run -Dmaven.test.skip=true -DskipTests"
     volumes:
-      - ./pagos:/app # CORREGIDO: Apunta a la carpeta del módulo de pagos
+      - ./:/app
+    working_dir: /app
 
 networks:
   red_pagos:
     driver: bridge
   red_universidad:
-    driver: bridge
+    external: true
+    name: proyecto_red_universidad  
 
 volumes:
   persistencia_db_pagos:

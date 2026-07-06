@@ -23,9 +23,12 @@ asignaturas:
   service:
     url: http://localhost:8080
 
-# Desactivar Swagger en tests
 springdoc:
   api-docs:
     enabled: false
   swagger-ui:
+    enabled: false
+
+eureka:
+  client:
     enabled: false

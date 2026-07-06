@@ -3,19 +3,21 @@ server:
 
 spring:
   application:
-    name: MS-PAGOS
+    name: MS-PAGOS  
   
   datasource:
-    
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://mysql_pagos:3306/pagos_db?createDatabaseIfNotExist=true}
-    username: ${SPRING_DATASOURCE_USERNAME:desarrollador}
-    password: ${SPRING_DATASOURCE_PASSWORD:password_seguro_123}
+    url: jdbc:mysql://mysql_pagos:3306/pagos_db?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
+    username: desarrollador
+    password: password_seguro_123
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
 
   cloud:
     compatibility-verifier:
@@ -29,31 +31,27 @@ spring:
 
 logging:
   level:
-    cl:
-      duoc:
-        pagos: INFO
+    cl.duoc.pagos: INFO
 
-# Conexiones Dinámicas Feign mediante properties
 estudiantes:
   service:
-    url: ${ESTUDIANTES_SERVICE_URL:http://localhost:8081}
+    url: ${ESTUDIANTES_SERVICE_URL:http://entorno_estudiante:8081}
 becas:
   service:
-    url: ${BECAS_SERVICE_URL:http://localhost:8086}
+    url: ${BECAS_SERVICE_URL:http://entorno_becas:8086}
 
-# Swagger UI / OpenAPI de la Asignatura
 springdoc:
   api-docs:
     enabled: true
+    path: /v3/api-docs/MS-PAGOS 
   swagger-ui:
     enabled: true
     path: /doc/swagger-ui.html
 
-# Registro en tu Eureka de AWS
 eureka:
   client:
     service-url:
       defaultZone: http://3.86.130.217:8761/eureka/
   instance:
     prefer-ip-address: true
-    ip-address: 54.91.52.2
+    ip-address: 54.91.52.2 

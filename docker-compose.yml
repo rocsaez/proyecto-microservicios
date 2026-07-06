@@ -14,17 +14,21 @@ services:
     environment:
       <<: *mysql_env
       MYSQL_DATABASE: estudiantes_db
-    ports: ["3317:3306"]
-    networks: [red_estudiantes]
+    ports: ["3306:3306"]
+    networks:
+      red_estudiantes:
+        aliases:
+          - mysql_servidor 
     volumes: [persistencia_db_estudiantes:/var/lib/mysql]
-
   workspace-java: 
     image: maven:3.9-eclipse-temurin-21
     container_name: entorno_programacion1
     ports: ["8081:8081"]
     depends_on: [db-estudiantes]
     networks: [red_estudiantes, red_universidad]
-    command: mvn spring-boot:run
+    environment:
+      - SPRING_CLOUD_INETUTILS_PREFERRED_NETWORKS=red_universidad
+    command: bash -c "sleep 60; mvn spring-boot:run -Dmaven.test.skip=true -DskipTests"
     volumes: ["./gestion-estudiante:/app"]
     working_dir: /app
 
@@ -45,7 +49,7 @@ services:
     ports: ["8082:8082"]
     depends_on: [db-profesor]
     networks: [red_profesores, red_universidad]
-    command: mvn spring-boot:run
+    command: bash -c "sleep 60; mvn spring-boot:run -Dmaven.test.skip=true -DskipTests"
     volumes: ["./gestion-profesor:/app"]
     working_dir: /app
 
@@ -66,7 +70,7 @@ services:
     ports: ["8083:8083"]
     depends_on: [db-biblioteca]
     networks: [red_biblioteca, red_universidad]
-    command: mvn spring-boot:run
+    command: bash -c "sleep 60; mvn spring-boot:run -Dmaven.test.skip=true -DskipTests"
     volumes: ["./sistema-biblioteca:/app"]
     working_dir: /app
 
@@ -87,7 +91,7 @@ services:
     ports: ["8084:8084"]
     depends_on: [db-evaluacion]
     networks: [red_evaluacion, red_universidad]
-    command: mvn spring-boot:run
+    command: bash -c "sleep 60; mvn spring-boot:run -Dmaven.test.skip=true -DskipTests"
     volumes: ["./sistema-evaluacion:/app"]
     working_dir: /app
 
@@ -108,7 +112,7 @@ services:
     ports: ["8085:8085"]
     depends_on: [db-inscripcion]
     networks: [red_inscripcion, red_universidad]
-    command: mvn spring-boot:run
+    command: bash -c "sleep 60; mvn spring-boot:run -Dmaven.test.skip=true -DskipTests"
     volumes: ["./sistema-inscripcion:/app"]
     working_dir: /app
 
@@ -129,7 +133,7 @@ services:
     ports: ["8086:8086"]
     depends_on: [db-beca]
     networks: [red_becas, red_universidad]
-    command: mvn spring-boot:run
+    command: bash -c "sleep 60; mvn spring-boot:run -Dmaven.test.skip=true -DskipTests"
     volumes: ["./becas:/app"]
     working_dir: /app
 
@@ -150,7 +154,7 @@ services:
     ports: ["8087:8087"]
     depends_on: [db-sala]
     networks: [red_salas, red_universidad]
-    command: mvn spring-boot:run
+    command: bash -c "sleep 60; mvn spring-boot:run -Dmaven.test.skip=true -DskipTests"
     volumes: ["./gestion-sala:/app"]
     working_dir: /app
 
@@ -161,7 +165,7 @@ services:
     environment:
       <<: *mysql_env
       MYSQL_DATABASE: asistencia_db
-    ports: ["3313:3306"]
+    ports: ["3317:3306"]
     networks: [red_asistencia]
     volumes: [persistencia_db_asistencia:/var/lib/mysql]
 
@@ -171,7 +175,7 @@ services:
     ports: ["8088:8088"]
     depends_on: [db-asistencia]
     networks: [red_asistencia, red_universidad]
-    command: mvn spring-boot:run
+    command: bash -c "sleep 60; mvn spring-boot:run -Dmaven.test.skip=true -DskipTests"
     volumes: ["./sistema-asistencia:/app"]
     working_dir: /app
 
@@ -180,29 +184,20 @@ services:
     image: mysql:8.0
     container_name: mysql_asignaturas
     environment:
-      MYSQL_ROOT_PASSWORD: clave_maestra_root
+      <<: *mysql_env
       MYSQL_DATABASE: asignaturas_db
-      MYSQL_USER: desarrollador
-      MYSQL_PASSWORD: password_seguro_123
-    ports:
-      - "3314:3306"
-    networks:
-      - red_universidad
-    volumes:
-      - persistencia_db_asignaturas:/var/lib/mysql
+    ports: ["3314:3306"]
+    networks: [red_asignaturas]
+    volumes: [persistencia_db_asignaturas:/var/lib/mysql]
 
   workspace-asignaturas:
     image: maven:3.9-eclipse-temurin-21
     container_name: entorno_asignaturas
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db-asignaturas
-    networks:
-      - red_universidad
-    command: bash -c "sleep 20; mvn spring-boot:run"
-    volumes:
-      - ./asignaturas:/app
+    ports: ["8080:8080"]
+    depends_on: [db-asignaturas]
+    networks: [red_asignaturas, red_universidad]
+    command: bash -c "sleep 60; mvn spring-boot:run -Dmaven.test.skip=true -DskipTests"
+    volumes: ["./asignaturas:/app"]
     working_dir: /app
 
   # --- MÓDULO CARRERA ---
@@ -213,7 +208,7 @@ services:
       <<: *mysql_env
       MYSQL_DATABASE: carrera_db
     ports: ["3315:3306"]
-    networks: [red_carrera, red_universidad]
+    networks: [red_carrera]
     volumes: [persistencia_db_carrera:/var/lib/mysql]
 
   workspace-carrera:
@@ -222,7 +217,7 @@ services:
     ports: ["8089:8089"]
     depends_on: [db-carrera]
     networks: [red_carrera, red_universidad]
-    command: mvn spring-boot:run
+    command: bash -c "sleep 60; mvn spring-boot:run -Dmaven.test.skip=true -DskipTests"
     volumes: ["./carrera:/app"]
     working_dir: /app
 
@@ -240,10 +235,10 @@ services:
   workspace-pagos:
     image: maven:3.9-eclipse-temurin-21
     container_name: entorno_pagos
-    ports: ["9090:8090"]
+    ports: ["8090:8090"]
     depends_on: [db-pagos]
     networks: [red_pagos, red_universidad]
-    command: mvn spring-boot:run
+    command: bash -c "sleep 60; mvn spring-boot:run -Dmaven.test.skip=true -DskipTests"
     volumes: ["./pagos:/app"]
     working_dir: /app
 
@@ -251,28 +246,39 @@ services:
   workspace-gateway:
     image: maven:3.9-eclipse-temurin-21
     container_name: entorno_gateway
-    ports:
-      - "8090:8090"
+    ports: ["8099:8099"]
     networks:
       - red_universidad
-    command: mvn spring-boot:run
-    volumes:
-      - ./ms-gateway:/app
+      - red_estudiantes  
+    command: bash -c "sleep 75; mvn spring-boot:run -Dmaven.test.skip=true -DskipTests"
+    volumes: ["./ms-gateway:/app"]
     working_dir: /app
 
 networks:
   red_universidad:
+    driver: bridge
   red_asignaturas:
+    driver: bridge
   red_becas:
+    driver: bridge
   red_carrera:
+    driver: bridge
   red_profesores:
+    driver: bridge
   red_salas:
+    driver: bridge
   red_pagos:
+    driver: bridge
   red_asistencia:
+    driver: bridge
   red_biblioteca:
+    driver: bridge
   red_evaluacion:
+    driver: bridge
   red_inscripcion:
+    driver: bridge
   red_estudiantes:
+    driver: bridge
 
 volumes:
   persistencia_db_asignaturas:

@@ -18,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/carreras")
+@CrossOrigin(origins = "*")
 @Tag(name = "Carreras", description = "Operaciones CRUD y de control para la gestión de carreras")
 public class CarreraController {
 

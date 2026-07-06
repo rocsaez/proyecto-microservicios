@@ -21,6 +21,7 @@ import java.util.List;
 @Tag(name = "Profesores", description = "Operaciones CRUD y de control para la gestión de profesores")
 @RestController
 @RequestMapping("/api/profesores")
+@CrossOrigin(origins = "*")
 public class GestionProfesorController {
 
     @Autowired

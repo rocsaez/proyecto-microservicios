@@ -19,6 +19,7 @@ import java.util.List;
 @Tag(name = "Becas", description = "Operaciones CRUD para la gestión de becas de estudiantes")
 @RestController
 @RequestMapping("/api/becas")
+@CrossOrigin(origins = "*")
 public class BecaController {
 
     @Autowired

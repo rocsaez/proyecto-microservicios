@@ -17,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/inscripciones")
+@CrossOrigin(origins = "*")
 @Tag(name = "Inscripciones", description = "Operaciones CRUD para el control de inscripciones de asignaturas")
 public class SistemaInscripcionesController {
 
