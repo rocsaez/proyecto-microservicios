@@ -85,3 +85,12 @@ Para volver a correr este reporte exacto en cualquiera de los entornos dockeriza
 
 ```bash
 docker exec -it <nombre_contenedor> mvn test
+
+Detener y remover por completo contenedores antiguos, redes y volúmenes huérfanos
+docker compose down --remove-orphans
+
+ Reconstruir las imágenes locales (eliminando caché intermedia) y levantar en segundo plano
+docker compose up -d --build
+
+ Monitorear los logs en tiempo real para verificar el correcto registro en el servidor Eureka
+docker compose logs -f
