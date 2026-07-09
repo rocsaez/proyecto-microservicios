@@ -10,6 +10,7 @@ El sistema se encuentra distribuido en la nube de Amazon Web Services (AWS EC2) 
   * IP Pública AWS: 3.86.130.217 (Puerto: 8761)
 * **Nodo de Microservicios y API Gateway:** Aloja los 11 microservicios core y la puerta de enlace pública.
   * IP Pública AWS: 54.91.52.2 (Puerto Gateway: 8099)
+* ** Link Github EUREKA https://github.com/rocsaez/ms-eureka.git
 
 ### Matriz de Microservicios, Puertos y Persistencia
 
